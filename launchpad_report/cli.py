@@ -51,10 +51,11 @@ def check_bug(bug):
         issues.append('No assignee')
     if not bug.milestone:
         issues.append('No milestone')
+    else:
+        if bug.milestone.name != CURRENT_MILESTONE:
+            issues.append('Related to non-current milestone (%s)' % bug.milestone.name)
     if bug.status == 'New':
         issues.append('Not triaged')
-    if bug.milestone.name != CURRENT_MILESTONE:
-        issues.append('Related to non-current milestone (%s)' % bug.milestone.name)
     return issues
 
 
@@ -121,9 +122,13 @@ def calc_bug_series():
             bug = task.bug
             bug_issues.setdefault(bug.web_link, [])
             if task.milestone not in milestones:
+                try:
+                    milestone_name = task.milestone.name
+                except:
+                    milestone_name = None
                 bug_issues[bug.web_link].append(
                     "Incorrect milestone (%s) for %s" % (
-                        task.milestone.name, series.name
+                        milestone_name, series.name
                     )
                 )
             if series == current_series:
