@@ -58,7 +58,7 @@ def check_bug(bug):
 
 
 # Launchpad API does not allow to get series of a blueprint
-def calc_bp_series:
+def calc_bp_series():
     print("Collecting blueprint series:")
     for series in project.series:
         printn(" %s" % series.name)
@@ -108,7 +108,7 @@ def bp_report(reporter):
 bug_issues = {}
 
 
-def calc_bug_series:
+def calc_bug_series():
     print("Processing bugs on series:")
 
     for series in project.series:
