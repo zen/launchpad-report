@@ -3,6 +3,7 @@ import codecs
 import cStringIO
 import sys
 
+
 class UnicodeWriter:
     """
     A CSV writer which will write rows to CSV file "f",

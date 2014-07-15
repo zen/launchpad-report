@@ -3,3 +3,5 @@
 # TODO: implement bugs series checks as work items
 # TODO: proceed blueprint header
 # TODO: work with private bugs
+# TODO: check milestones for bug series, collect statuses for backports, triage them
+# TODO: proceed Incomplete and other not-closed bugs
