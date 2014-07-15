@@ -1,0 +1,5 @@
+# TODO: implement work items
+# TODO: implement reviews checks + reviews checks as work items
+# TODO: implement bugs series checks as work items
+# TODO: proceed blueprint header
+# TODO: work with private bugs

@@ -1,86 +1,25 @@
-#!/usr/bin/env python
+import yaml
+import os
 
-import csv
-import codecs
-import cStringIO
-import sys
 from launchpadlib.launchpad import Launchpad
 
-PROJECT = 'fuel'
-CURRENT_MILESTONE = '5.1'
-teams = {
-    'python': [
-        'fuel-python', 'alekseyk-ru', 'dshulyak', 'rustyrobot', 'ikalnitsky',
-        'nmarkov', 'aroma-x', 'akislitsky', 'kozhukalov', 'lux-place'
-    ],
-    'ui': [
-        'fuel-ui', 'vkramskikh', 'astepanchuk', 'bdudko', 'kpimenova',
-        'jkirnosova'
-    ],
-    'library': [
-        'fuel-library', 'sgolovatiuk', 'xenolog', 'adidenko',
-        'raytrac3r', 'idv1985', 'bogdando', 'vkuklin', 'sbogatkin',
-    ],
-    'l2': ['manashkin', 'ekozhemyakin'],
-    'astute': ['fuel-astute', 'vsharshov'],
-    'osci': [
-        'fuel-osci', 'sotpuschennikov', 'dburmistrov', 'vparakhin', 'r0mikiam',
-        'mrasskazov',
-    ],
-    'qa': [
-        'fuel-qa', 'apalkina', 'aurlapova', 'tatyana-leontovich',
-        'asledzinskiy', 'apanchenko-8', 'ykotko',
-    ],
-    'devops': ['fuel-devops', 'afedorova', 'teran', 'acharykov'],
-    'us': ['dborodaenko', 'rmoe', 'xarses', 'dreidellhasa'],
-    'mos': [
-        'mos-linux', 'mos-neutron', 'mos-nova', 'mos-horizon',
-        'mos-ceilometer', 'mos-oslo', 'mos-sahara',
-    ],
-    'partners': ['izinovik'],
-}
-REPORT_FILE = 'report.csv'
-LIMIT_COUNT = 0  # For debug. Proceed only limited amount of items in project
+from launchpad_report.utils import printn, UnicodeWriter
 
-# TODO: implement work items
-# TODO: implement reviews checks + reviews checks as work items
-# TODO: implement bugs series checks as work items
-# TODO: proceed blueprint header
+config = yaml.load(open(
+    os.path.join(os.path.dirname(__file__), 'config.yaml'),'r'))
+PROJECT = config['project']
+CURRENT_MILESTONE = config['current_milestone']
+teams = config['teams']
+REPORT_FILE = config['report_file']
+LIMIT_COUNT = config['trunc_report']
 
-lp = Launchpad.login_anonymously('fuel-bot', 'production', version='devel')
+lp = Launchpad.login_anonymously(
+    'launchpad-report-bot', 'production', version='devel'
+)
 project = lp.projects[PROJECT]
 current_series = project.getMilestone(name=CURRENT_MILESTONE).series_target
 blueprint_series = {}
 
-
-class UnicodeWriter:
-    """
-    A CSV writer which will write rows to CSV file "f",
-    which is encoded in the given encoding.
-    """
-
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
-        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
-        self.stream = f
-        self.encoder = codecs.getincrementalencoder(encoding)()
-
-    def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
-        # Fetch UTF-8 output from the queue ...
-        data = self.queue.getvalue()
-        data = data.decode("utf-8")
-        # ... and reencode it into the target encoding
-        data = self.encoder.encode(data)
-        # write to the target stream
-        self.stream.write(data)
-        # empty queue
-        self.queue.truncate(0)
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
 
 csvfile = open(REPORT_FILE, 'wb')
 reporter = UnicodeWriter(csvfile)
@@ -88,11 +27,6 @@ reporter.writerow([
     '', 'Link', 'Title', 'Status', 'Priority', 'Team', 'Nick', 'Name',
     'Triage actions'
 ])
-
-
-def printn(text):
-    sys.stdout.write(text)
-    sys.stdout.flush()
 
 
 def check_bp(bp):
