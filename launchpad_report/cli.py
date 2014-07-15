@@ -10,7 +10,7 @@ config = yaml.load(open(
     'r'
 ))
 PROJECT = config['project']
-CURRENT_MILESTONE = config['current_milestone']
+CURRENT_MILESTONE = str(config['current_milestone'])
 teams = config['teams']
 REPORT_FILE = config['report_file']
 LIMIT_COUNT = config['trunc_report']
