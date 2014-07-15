@@ -19,7 +19,8 @@ lp = Launchpad.login_anonymously(
     'launchpad-report-bot', 'production', version='devel'
 )
 project = lp.projects[PROJECT]
-current_series = project.getMilestone(name=CURRENT_MILESTONE).series_target
+current_milestone = project.getMilestone(name=CURRENT_MILESTONE)
+current_series = current_milestone.series_target
 blueprint_series = {}
 
 
@@ -173,7 +174,19 @@ def bug_report(reporter):
     print  # /bugs
 
 
+class ConfigError(Exception):
+    pass
+
+
 def main():
+    if project is None:
+        raise ConfigError("No such project '%s'" % PROJECT)
+    if current_milestone is None:
+        raise ConfigError(
+            "current_milestone '%s' is incorrect" % CURRENT_MILESTONE
+        )
+    if current_series is None:
+        raise ConfigError("No series for '%s' milestone" % CURRENT_MILESTONE)
     csvfile = open(REPORT_FILE, 'wb')
     reporter = UnicodeWriter(csvfile)
     reporter.writerow([
