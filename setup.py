@@ -32,5 +32,5 @@ setup(
     install_requires=parse_requirements_txt(),
     include_package_data=True,
     package_data={'': ['*.yaml']},
-    entry_points={'console_scripts': ['l-report = launchpad_report.cli:main']}
+    entry_points={'console_scripts': ['lp-report = launchpad_report.cli:main']}
 )
