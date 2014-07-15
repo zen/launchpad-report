@@ -1,0 +1,12 @@
+*.pyc
+.*.swp
+*.log
+dist
+nosetests.xml
+*.egg
+.testrepository
+.tox
+.venv
+.idea
+.DS_Store
+*.egg-info

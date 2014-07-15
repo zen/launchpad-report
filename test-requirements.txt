@@ -1,0 +1,2 @@
+-r requirements.txt
+hacking==0.7
