@@ -116,7 +116,7 @@ def check_bp(bp):
 
 def check_bug(bug):
     issues = []
-    if bug.importance == 'Undefined':
+    if bug.importance == 'Undecided':
         issues.append('No priority')
     if not bug.assignee:
         issues.append('No assignee')
