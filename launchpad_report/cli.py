@@ -39,7 +39,7 @@ def check_bp(bp):
     else:
         series = project.getSeries(name=blueprint_series[bp.web_link])
         if bp.milestone not in series.active_milestones:
-            issues.append('Wrong milestone')
+            issues.append('Wrong milestone (%s)' % bp.milestone.name)
     return issues
 
 
@@ -54,7 +54,7 @@ def check_bug(bug):
     if bug.status == 'New':
         issues.append('Not triaged')
     if bug.milestone.name != CURRENT_MILESTONE:
-        issues.append('Not related to current milestone')
+        issues.append('Related to non-current milestone (%s)' % bug.milestone.name)
     return issues
 
 
@@ -72,14 +72,14 @@ def calc_bp_series():
 
 def bp_report(reporter):
     blueprints = project.valid_specifications
-    print("Processing blueprints (%d):" % len(blueprints))
+    printn("Processing blueprints (%d):" % len(blueprints))
     for (counter, bp) in enumerate(blueprints, 1):
         if counter > LIMIT_COUNT and LIMIT_COUNT > 0:
             break
+        if counter % 200 == 10:
+            print
         if counter % 10 == 0:
             printn("%4d" % counter)
-        if counter % 200 == 0:
-            print
         assignee = 'unassigned'
         assignee_name = 'unassigned'
         try:
@@ -122,7 +122,9 @@ def calc_bug_series():
             bug_issues.setdefault(bug.web_link, [])
             if task.milestone not in milestones:
                 bug_issues[bug.web_link].append(
-                    "Incorrect milestone for %s" % series.name
+                    "Incorrect milestone (%s) for %s" % (
+                        task.milestone.name, series.name
+                    )
                 )
             if series == current_series:
                 bug_issues[bug.web_link].append(
@@ -134,15 +136,15 @@ def calc_bug_series():
 
 def bug_report(reporter):
     bugs = project.searchTasks()
-    print("Processing bugs (%d):" % len(bugs))
+    printn("Processing bugs (%d):" % len(bugs))
 
     for (counter, bug) in enumerate(bugs, 1):
         if counter > LIMIT_COUNT and LIMIT_COUNT > 0:
             break
+        if counter % 200 == 10:
+            print
         if counter % 10 == 0:
             printn("%4d" % counter)
-        if counter % 200 == 0:
-            print
         assignee = 'unassigned'
         assignee_name = 'unassigned'
         try:
