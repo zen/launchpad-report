@@ -14,10 +14,16 @@ CURRENT_MILESTONE = str(config['current_milestone'])
 teams = config['teams']
 REPORT_FILE = config['report_file']
 LIMIT_COUNT = config['trunc_report']
+cache_dir = config['cache_dir']
 
-lp = Launchpad.login_anonymously(
-    'launchpad-report-bot', 'production', version='devel'
-)
+if config['use_auth']:
+    lp = Launchpad.login_with('lp-report-bot', 'production',
+        cache_dir, version='devel'
+    )
+else:
+    lp = Launchpad.login_anonymously(
+        'launchpad-report-bot', 'production', version='devel'
+    )
 project = lp.projects[PROJECT]
 current_milestone = project.getMilestone(name=CURRENT_MILESTONE)
 current_series = current_milestone.series_target

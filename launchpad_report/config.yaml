@@ -3,6 +3,8 @@ current_milestone: '5.1'
 report_file: report.csv
 # For debug. Proceed only limited amount of items in project
 trunc_report: 0
+cache_dir: cache
+use_auth: True
 teams:
   python:
     fuel-python
