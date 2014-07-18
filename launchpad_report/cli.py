@@ -105,12 +105,11 @@ def bp_report(reporter):
             status = 'backlog'
         if bp.is_complete:
             status = 'done'
-        if status != 'done':
-            reporter.writerow([
-                'bp', bp.web_link, bp.title, bp.implementation_status,
-                bp.priority, team, assignee, assignee_name,
-                ', '.join(check_bp(bp))
-            ])
+        reporter.writerow([
+            'bp', bp.web_link, bp.title, bp.implementation_status,
+            bp.priority, team, assignee, assignee_name,
+            ', '.join(check_bp(bp))
+        ])
     print
 
 bug_issues = {}
@@ -177,14 +176,13 @@ def bug_report(reporter):
             status = 'done'
         if bug.status == 'In Progress':
             status = 'in progress'
-        if status != 'done':
-            reporter.writerow([
-                'bug', bug.web_link, title, bug.status, bug.importance, team,
-                assignee, assignee_name,
-                ', '.join(check_bug(bug) + bug_issues[bug.bug.web_link]),
-            ])
+        reporter.writerow([
+            'bug', bug.web_link, title, bug.status, bug.importance, team,
+            assignee, assignee_name,
+            ', '.join(check_bug(bug) + bug_issues[bug.bug.web_link]),
+        ])
 
-    print  # /bugs
+    print
 
 
 class ConfigError(Exception):
