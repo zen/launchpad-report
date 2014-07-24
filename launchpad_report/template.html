@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>lp-report: {{ config.project }}-{{ config.current_milestone }}</title>
+</head>
+<body>
+<h1>lp-report: {{ config.project }}-{{ config.current_milestone }}</h1>
+<table>
+<tr>
+<th>&nbsp;</th>
+<th>Title</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Team</th>
+<th>Assignee</th>
+<th>Full Name</th>
+<th>Required triage actins</th>
+</tr>
+{% for item in rows %}
+<tr>
+<td>{{ item.type }}</td>
+<td><a href="{{ item.link }}">{{ item.title}}</a></td>
+<td>{{ item.status }}</td>
+<td>{{ item.priority }}</td>
+<td>{{ item.team }}</td>
+<td>{{ item.assignee }}</td>
+<td>{{ item.name }}</td>
+<td>{{ item.trage }}</td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>

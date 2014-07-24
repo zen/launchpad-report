@@ -11,4 +11,5 @@ nosetests.xml
 .DS_Store
 *.egg-info
 *.csv
+/report.html
 /cache
