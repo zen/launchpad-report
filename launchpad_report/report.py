@@ -159,15 +159,15 @@ class Report(object):
             ])
             report.append({
                 'type': 'bp',
-                'link': bp.web_link,
-                'id': bp.web_link[bp.web_link.rfind('/')+1:],
-                'title': bp.title,
+                'link': bp.web_link.encode('utf-8'),
+                'id': bp.web_link[bp.web_link.rfind('/')+1:].encode('utf-8'),
+                'title': bp.title.encode('utf-8'),
                 'status': bp.implementation_status,
                 'priority': bp.priority,
-                'team': team,
-                'assignee': assignee,
-                'name': assignee_name,
-                'triage': ', '.join(self.check_bp(bp))
+                'team': team.encode('utf-8'),
+                'assignee': assignee.encode('utf-8'),
+                'name': assignee_name.encode('utf-8'),
+                'triage': ', '.join(self.check_bp(bp)).encode('utf-8')
             })
         print
         return report
@@ -242,15 +242,15 @@ class Report(object):
             ])
             report.append({
                 'type': 'bug',
-                'link': bug.web_link,
-                'id': bug.web_link[bug.web_link.rfind('/')+1:],
-                'title': title,
+                'link': bug.web_link.encode('utf-8'),
+                'id': bug.web_link[bug.web_link.rfind('/')+1:].encode('utf-8'),
+                'title': title.encode('utf-8'),
                 'status': bug.status,
                 'priority': bug.importance,
-                'team': team,
-                'assignee': assignee,
-                'name': assignee_name,
-                'triage': ', '.join(self.check_bug(bug) + self.bug_issues[bug.bug.web_link]),
+                'team': team.encode('utf-8'),
+                'assignee': assignee.encode('utf-8'),
+                'name': assignee_name.encode('utf-8'),
+                'triage': ', '.join(self.check_bug(bug) + self.bug_issues[bug.bug.web_link]).encode('utf-8'),
             })
         print
         return report

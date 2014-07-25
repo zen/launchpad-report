@@ -1,9 +1,12 @@
 import argparse
 import os
+import sys
 
 from launchpad_report.report import Report
 
 def main():
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
     description = """
     Generate status report for bugs and blueprints in Launchpad project
     """
