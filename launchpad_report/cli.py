@@ -1,8 +1,7 @@
 import argparse
+from launchpad_report.report import Report
 import os
 import sys
-
-from launchpad_report.report import Report
 
 
 def main():
