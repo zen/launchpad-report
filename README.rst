@@ -15,5 +15,6 @@ Report example:
 Known Issues
 ============
 
-launchpadlib (required for launchpad-report) requires lazr.authentication
-lazr.authentication (requirement for launchpadlib) is broken on pypi. You can install it manually from `launchpad <https://launchpad.net/lazr.authentication/+download>`_
+lazr.authentication (requirement for launchpadlib) is broken on pypi. You can install it manually from `launchpad <https://launchpad.net/lazr.authentication/+download>`_:
+
+   pip install https://launchpad.net/lazr.authentication/trunk/0.1.2/+download/lazr.authentication-0.1.2.tar.gz
