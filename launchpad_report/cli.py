@@ -4,6 +4,7 @@ import sys
 
 from launchpad_report.report import Report
 
+
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -22,8 +23,20 @@ def main():
         default=os.path.join(os.path.dirname(__file__), 'config.yaml')
     )
     parser.add_argument(
-        '-o', '--output', dest='output', action='store', type=str,
-        help='where to output templating result', default='report.html'
+        '-j', '--outjson', dest='outjson', action='store', type=str,
+        help='where to output json report', default='report.json'
+    )
+    parser.add_argument(
+        '-c', '--outcsv', dest='outcsv', action='store', type=str,
+        help='where to output csv report', default='report.csv'
+    )
+    parser.add_argument(
+        '-t', '--outhtml', dest='outhtml', action='store', type=str,
+        help='where to output html report', default='report.html'
+    )
+    parser.add_argument(
+        '-l', '--load-json', dest='loadjson', action='store', type=str,
+        help='generate report from previous json report'
     )
     params, other_params = parser.parse_known_args()
 
@@ -32,9 +45,14 @@ def main():
         template_filename=params.template
     )
 
-    report.generate()
-
-    if params.output == '-':
-        print report.render()
+    if params.loadjson:
+        report.load(params.loadjson)
     else:
-        report.render2file(params.output)
+        report.generate()
+
+    # if params.output == '-':
+    #     print report.render()
+    # else:
+    report.render2csv(params.outcsv)
+    report.render2json(params.outjson)
+    report.render2html(params.outhtml)

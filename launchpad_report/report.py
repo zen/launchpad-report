@@ -1,6 +1,8 @@
-import yaml
+import json
 import os
+import yaml
 
+from __future__ import print_function
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from launchpadlib.launchpad import Launchpad
@@ -9,8 +11,6 @@ from launchpad_report.utils import printn, UnicodeWriter
 
 class ConfigError(Exception):
     pass
-
-
 
 
 class Report(object):
@@ -22,23 +22,25 @@ class Report(object):
         self.trunc = self.config['trunc_report']
 
         cache_dir = self.config['cache_dir']
-        
+
         if self.config['use_auth']:
-            lp = Launchpad.login_with('lp-report-bot', 'production',
+            lp = Launchpad.login_with(
+                'lp-report-bot', 'production',
                 cache_dir, version='devel'
             )
         else:
             lp = Launchpad.login_anonymously(
-                'launchpad-report-bot', 'production', version='devel'
+                'lp-report-bot', 'production', version='devel'
             )
         self.project = lp.projects[self.config['project']]
-        self.current_milestone = self.project.getMilestone(name=self.config['current_milestone'])
+        self.current_milestone = self.project.getMilestone(
+            name=self.config['current_milestone']
+        )
         self.current_series = self.current_milestone.series_target
         self.blueprint_series = {}
 
-
         self.env = Environment(
-            loader = FileSystemLoader(
+            loader=FileSystemLoader(
                 os.path.dirname(os.path.abspath(template_filename))
             )
         )
@@ -49,32 +51,53 @@ class Report(object):
     def render(self):
         return self.template.render(self.data)
 
-    def render2file(self, filename):
+    def render2html(self, filename):
         with open(filename, "w") as f:
             f.write(self.render())
+
+    def render2csv(self, filename):
+        csvfile = open(filename, 'wb')
+        reporter = UnicodeWriter(csvfile)
+        reporter.writerow(self.data['headers'])
+        for row in self.data['rows']:
+            reporter.writerow([
+                row['type'], row['link'], row['title'], row['status'],
+                row['priority'], row['team'], row['assignee'], row['name'],
+                row['triage']
+            ])
+
+    def render2json(self, filename):
+        jsonfile = open(filename, 'wb')
+        json.dump(self.data, jsonfile)
+
+    def load(self, filename):
+        jsonfile = open(filename)
+        self.data = json.load(jsonfile)
 
     def generate(self):
         if self.project is None:
             raise ConfigError("No such project '%s'" % self.config['project'])
         if self.current_milestone is None:
             raise ConfigError(
-                "current_milestone '%s' is incorrect" % self.config['current_milestone']
+                "current_milestone '%s' is incorrect" %
+                self.config['current_milestone']
             )
         if self.current_series is None:
-            raise ConfigError("No series for '%s' milestone" % self.config['current_milestone'])
-        csvfile = open(self.config['report_file'], 'wb')
-        self.reporter = UnicodeWriter(csvfile)
-        self.reporter.writerow([
+            raise ConfigError(
+                "No series for '%s' milestone" %
+                self.config['current_milestone']
+            )
+        self.data = {'rows': []}
+        self.data['headers'] = [
             '', 'Link', 'Title', 'Status', 'Priority', 'Team', 'Nick', 'Name',
             'Triage actions'
-        ])
-	self.data = {'rows': []}
+        ]
         self.data['config'] = self.config
         self.bug_issues = {}
         self.calc_bp_series()
-        self.data['rows'] += self.bp_report(self.reporter)
+        self.data['rows'] += self.bp_report()
         self.calc_bug_series()
-        self.data['rows'] += self.bug_report(self.reporter)
+        self.data['rows'] += self.bug_report()
 
     def check_bp(self, bp):
         issues = []
@@ -89,12 +112,12 @@ class Report(object):
         if not bp.web_link in self.blueprint_series.keys():
             issues.append('No series')
         else:
-            series = self.project.getSeries(name=self.blueprint_series[bp.web_link])
+            series = self.project.getSeries(
+                name=self.blueprint_series[bp.web_link])
             if bp.milestone not in series.active_milestones:
                 issues.append('Wrong milestone (%s)' % bp.milestone.name)
         return issues
-    
-    
+
     def check_bug(self, bug):
         issues = []
         if bug.importance == 'Undecided':
@@ -105,12 +128,13 @@ class Report(object):
             issues.append('No milestone')
         else:
             if bug.milestone.name != self.config['current_milestone']:
-                issues.append('Related to non-current milestone (%s)' % bug.milestone.name)
+                issues.append(
+                    'Related to non-current milestone (%s)' %
+                    bug.milestone.name)
         if bug.status == 'New':
             issues.append('Not triaged')
         return issues
-    
-    
+
     # Launchpad API does not allow to get series of a blueprint
     def calc_bp_series(self):
         print("Collecting blueprint series:")
@@ -121,9 +145,8 @@ class Report(object):
                     break
                 self.blueprint_series[bp.web_link] = series.name
         print
-    
-    
-    def bp_report(self, reporter):
+
+    def bp_report(self):
         report = []
         blueprints = self.project.valid_specifications
         printn("Processing blueprints (%d):" % len(blueprints))
@@ -152,11 +175,6 @@ class Report(object):
                 status = 'backlog'
             if bp.is_complete:
                 status = 'done'
-            reporter.writerow([
-                'bp', bp.web_link, bp.title, bp.implementation_status,
-                bp.priority, team, assignee, assignee_name,
-                ', '.join(self.check_bp(bp))
-            ])
             report.append({
                 'type': 'bp',
                 'link': bp.web_link.encode('utf-8'),
@@ -171,11 +189,10 @@ class Report(object):
             })
         print
         return report
-    
-    
+
     def calc_bug_series(self):
         print("Processing bugs on series:")
-    
+
         for series in self.project.series:
             printn(" %s" % series.name)
             milestones = series.active_milestones
@@ -200,13 +217,12 @@ class Report(object):
                     )
                 pass
         print
-    
-    
-    def bug_report(self, reporter):
+
+    def bug_report(self):
         report = []
         bugs = self.project.searchTasks()
         printn("Processing bugs (%d):" % len(bugs))
-    
+
         for (counter, bug) in enumerate(bugs, 1):
             if counter > self.trunc and self.trunc > 0:
                 break
@@ -235,11 +251,6 @@ class Report(object):
                 status = 'done'
             if bug.status == 'In Progress':
                 status = 'in progress'
-            reporter.writerow([
-                'bug', bug.web_link, title, bug.status, bug.importance, team,
-                assignee, assignee_name,
-                ', '.join(self.check_bug(bug) + self.bug_issues[bug.bug.web_link]),
-            ])
             report.append({
                 'type': 'bug',
                 'link': bug.web_link.encode('utf-8'),
@@ -250,7 +261,10 @@ class Report(object):
                 'team': team.encode('utf-8'),
                 'assignee': assignee.encode('utf-8'),
                 'name': assignee_name.encode('utf-8'),
-                'triage': ', '.join(self.check_bug(bug) + self.bug_issues[bug.bug.web_link]).encode('utf-8'),
+                'triage': ', '.join(
+                    self.check_bug(bug) +
+                    self.bug_issues[bug.bug.web_link]
+                ).encode('utf-8'),
             })
-        print
+        print()
         return report
