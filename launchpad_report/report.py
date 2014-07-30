@@ -1,12 +1,15 @@
+from __future__ import print_function
+
 import json
 import os
-import yaml
 
-from __future__ import print_function
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from launchpadlib.launchpad import Launchpad
-from launchpad_report.utils import printn, UnicodeWriter
+import yaml
+
+from launchpad_report.utils import printn
+from launchpad_report.utils import UnicodeWriter
 
 
 class ConfigError(Exception):
@@ -109,7 +112,7 @@ class Report(object):
             issues.append('No assignee')
         if not bp.milestone:
             issues.append('No milestone')
-        if not bp.web_link in self.blueprint_series.keys():
+        if bp.web_link not in self.blueprint_series.keys():
             issues.append('No series')
         else:
             series = self.project.getSeries(
@@ -144,7 +147,7 @@ class Report(object):
                 if counter > self.trunc and self.trunc > 0:
                     break
                 self.blueprint_series[bp.web_link] = series.name
-        print
+        print()
 
     def bp_report(self):
         report = []
@@ -154,7 +157,7 @@ class Report(object):
             if counter > self.trunc and self.trunc > 0:
                 break
             if counter % 200 == 10:
-                print
+                print()
             if counter % 10 == 0:
                 printn("%4d" % counter)
             assignee = 'unassigned'
@@ -162,7 +165,7 @@ class Report(object):
             try:
                 assignee = bp.assignee.name
                 assignee_name = bp.assignee.display_name
-            except:
+            except Exception:
                 pass
             team = 'unknown'
             status = 'error'
@@ -178,7 +181,9 @@ class Report(object):
             report.append({
                 'type': 'bp',
                 'link': bp.web_link.encode('utf-8'),
-                'id': bp.web_link[bp.web_link.rfind('/')+1:].encode('utf-8'),
+                'id': bp.web_link[
+                    bp.web_link.rfind('/') + 1:
+                ].encode('utf-8'),
                 'title': bp.title.encode('utf-8'),
                 'status': bp.implementation_status,
                 'priority': bp.priority,
@@ -187,7 +192,7 @@ class Report(object):
                 'name': assignee_name.encode('utf-8'),
                 'triage': ', '.join(self.check_bp(bp)).encode('utf-8')
             })
-        print
+        print()
         return report
 
     def calc_bug_series(self):
@@ -204,7 +209,7 @@ class Report(object):
                 if task.milestone not in milestones:
                     try:
                         milestone_name = task.milestone.name
-                    except:
+                    except Exception:
                         milestone_name = None
                     self.bug_issues[bug.web_link].append(
                         "Incorrect milestone (%s) for %s" % (
@@ -216,7 +221,7 @@ class Report(object):
                         "Remove targeting to current series"
                     )
                 pass
-        print
+        print()
 
     def bug_report(self):
         report = []
@@ -227,7 +232,7 @@ class Report(object):
             if counter > self.trunc and self.trunc > 0:
                 break
             if counter % 200 == 10:
-                print
+                print()
             if counter % 10 == 0:
                 printn("%4d" % counter)
             assignee = 'unassigned'
@@ -235,7 +240,7 @@ class Report(object):
             try:
                 assignee = bug.assignee.name
                 assignee_name = bug.assignee.display_name
-            except:
+            except Exception:
                 pass
             team = 'unknown'
             status = 'backlog'
@@ -246,15 +251,20 @@ class Report(object):
             title = bug.bug.title
             if bug.is_complete:
                 status = 'done'
-            if bug.status == 'Fix Committed' or bug.status == 'Fix Released' \
-                    or bug.status == 'Incomplete':
+            if (
+                bug.status == 'Fix Committed' or
+                bug.status == 'Fix Released' or
+                bug.status == 'Incomplete'
+            ):
                 status = 'done'
             if bug.status == 'In Progress':
                 status = 'in progress'
             report.append({
                 'type': 'bug',
                 'link': bug.web_link.encode('utf-8'),
-                'id': bug.web_link[bug.web_link.rfind('/')+1:].encode('utf-8'),
+                'id': bug.web_link[
+                    bug.web_link.rfind('/') + 1:
+                ].encode('utf-8'),
                 'title': title.encode('utf-8'),
                 'status': bug.status,
                 'priority': bug.importance,
