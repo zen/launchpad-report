@@ -1,2 +1,4 @@
 launchpadlib
 PyYAML
+jinja2
+argparse
