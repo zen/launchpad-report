@@ -26,11 +26,11 @@ def main():
         help='where to output json report', default='report.json'
     )
     parser.add_argument(
-        '-c', '--outcsv', dest='outcsv', action='store', type=str,
+        '-s', '--outcsv', dest='outcsv', action='store', type=str,
         help='where to output csv report', default='report.csv'
     )
     parser.add_argument(
-        '-t', '--outhtml', dest='outhtml', action='store', type=str,
+        '-m', '--outhtml', dest='outhtml', action='store', type=str,
         help='where to output html report', default='report.html'
     )
     parser.add_argument(
