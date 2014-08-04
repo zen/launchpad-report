@@ -12,4 +12,5 @@ nosetests.xml
 *.egg-info
 *.csv
 /report.html
+/report.json
 /cache

@@ -55,9 +55,9 @@ class CSVRenderer(Renderer):
         reporter.writerow(data['headers'])
         for row in data['rows']:
             reporter.writerow([
-                row['type'], row['link'], row['title'], row['status'],
-                row['priority'], row['team'], row['assignee'], row['name'],
-                row['triage']
+                row['type'], row['link'], row['title'], row['milestone'],
+                row['status'], row['priority'], row['team'], row['assignee'],
+                row['name'], row['triage']
             ])
         return csvfile.getvalue()
 

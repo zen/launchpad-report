@@ -144,6 +144,10 @@ class Report(object):
                 assignee_name = bp.assignee.display_name
             except Exception:
                 pass
+            if bp.milestone:
+                milestone = bp.milestone.name
+            else:
+                milestone = 'None'
             team = 'unknown'
             status = 'error'
             for t in self.teams.keys():
@@ -162,6 +166,7 @@ class Report(object):
                     bp.web_link.rfind('/') + 1:
                 ].encode('utf-8'),
                 'title': bp.title.encode('utf-8'),
+                'milestone': milestone,
                 'status': bp.implementation_status,
                 'short_status': status,
                 'priority': bp.priority,
@@ -220,6 +225,10 @@ class Report(object):
                 assignee_name = bug.assignee.display_name
             except Exception:
                 pass
+            if bug.milestone:
+                milestone = bug.milestone.name
+            else:
+                milestone = 'None'
             team = 'unknown'
             status = 'backlog'
             self.bug_issues.setdefault(bug.bug.web_link, [])
@@ -244,6 +253,7 @@ class Report(object):
                     bug.web_link.rfind('/') + 1:
                 ].encode('utf-8'),
                 'title': title.encode('utf-8'),
+                'milestone': milestone,
                 'status': bug.status,
                 'short_status': status,
                 'priority': bug.importance,
