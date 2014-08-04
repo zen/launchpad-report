@@ -1,15 +1,14 @@
 from __future__ import print_function
 
 import json
-import os
 
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
 from launchpadlib.launchpad import Launchpad
 import yaml
 
+from launchpad_report.render import CSVRenderer
+from launchpad_report.render import HTMLRenderer
+from launchpad_report.render import JSONRenderer
 from launchpad_report.utils import printn
-from launchpad_report.utils import UnicodeWriter
 
 
 class ConfigError(Exception):
@@ -17,7 +16,7 @@ class ConfigError(Exception):
 
 
 class Report(object):
-    def __init__(self, config_filename, template_filename):
+    def __init__(self, config_filename):
         with open(config_filename, "r") as f:
             self.config = yaml.load(f.read())
 
@@ -42,36 +41,14 @@ class Report(object):
         self.current_series = self.current_milestone.series_target
         self.blueprint_series = {}
 
-        self.env = Environment(
-            loader=FileSystemLoader(
-                os.path.dirname(os.path.abspath(template_filename))
-            )
-        )
-        self.template = self.env.get_template(
-            os.path.basename(os.path.abspath(template_filename))
-        )
-
-    def render(self):
-        return self.template.render(self.data)
-
-    def render2html(self, filename):
-        with open(filename, "w") as f:
-            f.write(self.render())
+    def render2html(self, filename, template_filename):
+        HTMLRenderer(filename, template_filename).render(self.data)
 
     def render2csv(self, filename):
-        csvfile = open(filename, 'wb')
-        reporter = UnicodeWriter(csvfile)
-        reporter.writerow(self.data['headers'])
-        for row in self.data['rows']:
-            reporter.writerow([
-                row['type'], row['link'], row['title'], row['status'],
-                row['priority'], row['team'], row['assignee'], row['name'],
-                row['triage']
-            ])
+        CSVRenderer(filename).render(self.data)
 
     def render2json(self, filename):
-        jsonfile = open(filename, 'wb')
-        json.dump(self.data, jsonfile)
+        JSONRenderer(filename).render(self.data)
 
     def load(self, filename):
         jsonfile = open(filename)

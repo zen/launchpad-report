@@ -40,8 +40,7 @@ def main():
     params, other_params = parser.parse_known_args()
 
     report = Report(
-        config_filename=params.config,
-        template_filename=params.template
+        config_filename=params.config
     )
 
     if params.loadjson:
@@ -54,4 +53,4 @@ def main():
     # else:
     report.render2csv(params.outcsv)
     report.render2json(params.outjson)
-    report.render2html(params.outhtml)
+    report.render2html(params.outhtml, params.template)
