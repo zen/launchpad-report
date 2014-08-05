@@ -68,10 +68,6 @@ class Report(object):
                 self.config['current_milestone']
             )
         self.data = {'rows': []}
-        self.data['headers'] = [
-            '', 'Link', 'Title', 'Status', 'Priority', 'Team', 'Nick', 'Name',
-            'Triage actions'
-        ]
         self.data['config'] = self.config
         self.bug_issues = {}
         self.calc_bp_series()

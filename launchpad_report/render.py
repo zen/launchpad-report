@@ -52,7 +52,10 @@ class CSVRenderer(Renderer):
     def _render(self, data):
         csvfile = BytesIO()
         reporter = UnicodeWriter(csvfile)
-        reporter.writerow(data['headers'])
+        reporter.writerow([
+            '', 'Link', 'Title', 'Milestone', 'Status', 'Priority', 'Team',
+            'Nick', 'Name', 'Triage actions'
+        ])
         for row in data['rows']:
             reporter.writerow([
                 row['type'], row['link'], row['title'], row['milestone'],
