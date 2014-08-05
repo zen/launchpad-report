@@ -5,10 +5,25 @@ import json
 from launchpadlib.launchpad import Launchpad
 import yaml
 
+from launchpad_report.checks import Checks
 from launchpad_report.render import CSVRenderer
 from launchpad_report.render import HTMLRenderer
 from launchpad_report.render import JSONRenderer
 from launchpad_report.utils import printn
+
+all_bug_statuses = [
+    'New', 'Incomplete', 'Opinion', 'Invalid', 'Won\'t Fix',
+    'Expired', 'Confirmed', 'Triaged', 'In Progress',
+    'Fix Committed', 'Fix Released', 'Incomplete (with response)',
+    'Incomplete (without response)'
+]
+
+
+def is_series(obj):
+    return (
+        obj.resource_type_link ==
+        u'https://api.launchpad.net/devel/#project_series'
+    )
 
 
 class ConfigError(Exception):
@@ -35,10 +50,6 @@ class Report(object):
                 'lp-report-bot', 'production', version='devel'
             )
         self.project = lp.projects[self.config['project']]
-        self.current_milestone = self.project.getMilestone(
-            name=self.config['current_milestone']
-        )
-        self.current_series = self.current_milestone.series_target
         self.blueprint_series = {}
 
     def render2html(self, filename, template_filename):
@@ -57,74 +68,38 @@ class Report(object):
     def generate(self):
         if self.project is None:
             raise ConfigError("No such project '%s'" % self.config['project'])
-        if self.current_milestone is None:
-            raise ConfigError(
-                "current_milestone '%s' is incorrect" %
-                self.config['current_milestone']
-            )
-        if self.current_series is None:
-            raise ConfigError(
-                "No series for '%s' milestone" %
-                self.config['current_milestone']
-            )
+        self.checks = Checks(self.iter_series())
         self.data = {'rows': []}
         self.data['config'] = self.config
         self.bug_issues = {}
-        self.calc_bp_series()
         self.data['rows'] += self.bp_report()
-        self.calc_bug_series()
         self.data['rows'] += self.bug_report()
 
-    def check_bp(self, bp):
-        issues = []
-        if bp.priority == 'Undefined':
-            issues.append('No priority')
-        if bp.priority == 'Not':
-            issues.append('Not priority')
-        if not bp.assignee:
-            issues.append('No assignee')
-        if not bp.milestone:
-            issues.append('No milestone')
-        if bp.web_link not in self.blueprint_series.keys():
-            issues.append('No series')
-        else:
-            series = self.project.getSeries(
-                name=self.blueprint_series[bp.web_link])
-            if bp.milestone not in series.active_milestones:
-                issues.append('Wrong milestone (%s)' % bp.milestone.name)
-        return issues
-
-    def check_bug(self, bug):
-        issues = []
-        if bug.importance == 'Undecided':
-            issues.append('No priority')
-        if not bug.assignee:
-            issues.append('No assignee')
-        if not bug.milestone:
-            issues.append('No milestone')
-        else:
-            if bug.milestone.name != self.config['current_milestone']:
-                issues.append(
-                    'Related to non-current milestone (%s)' %
-                    bug.milestone.name)
-        if bug.status == 'New':
-            issues.append('Not triaged')
-        return issues
-
-    # Launchpad API does not allow to get series of a blueprint
-    def calc_bp_series(self):
-        print("Collecting blueprint series:")
+    def iter_series(self):
+        print("Collecting series data:")
+        self.bps_series = {}
+        self.milestones_series = {}
         for series in self.project.series:
             printn(" %s" % series.name)
-            for (counter, bp) in enumerate(series.valid_specifications):
-                if counter > self.trunc and self.trunc > 0:
-                    break
-                self.blueprint_series[bp.web_link] = series.name
+            # Blueprints
+            for (counter, bp) in enumerate(series.all_specifications):
+                self.bps_series.setdefault(bp.name, [])
+                self.bps_series[bp.name].append(series.name)
+            # Milestones
+            for milestone in series.all_milestones:
+                self.milestones_series[milestone.name] = series.name
+        printn(" none")
+        # Search for blueprints without series
+        for (counter, bp) in enumerate(self.project.all_specifications):
+            self.bps_series.setdefault(bp.name, [None])
         print()
+        return {
+            'milestones': self.milestones_series,
+        }
 
     def bp_report(self):
         report = []
-        blueprints = self.project.valid_specifications
+        blueprints = self.project.all_specifications
         printn("Processing blueprints (%d):" % len(blueprints))
         for (counter, bp) in enumerate(blueprints, 1):
             if counter > self.trunc and self.trunc > 0:
@@ -155,6 +130,7 @@ class Report(object):
                 status = 'backlog'
             if bp.is_complete:
                 status = 'done'
+            triage = self.checks.run(bp, self.bps_series[bp.name])
             report.append({
                 'type': 'bp',
                 'link': bp.web_link.encode('utf-8'),
@@ -163,48 +139,21 @@ class Report(object):
                 ].encode('utf-8'),
                 'title': bp.title.encode('utf-8'),
                 'milestone': milestone,
+                'series': self.bps_series[bp.name],
                 'status': bp.implementation_status,
                 'short_status': status,
                 'priority': bp.priority,
                 'team': team.encode('utf-8'),
                 'assignee': assignee.encode('utf-8'),
                 'name': assignee_name.encode('utf-8'),
-                'triage': ', '.join(self.check_bp(bp)).encode('utf-8')
+                'triage': ', '.join(triage).encode('utf-8')
             })
         print()
         return report
 
-    def calc_bug_series(self):
-        print("Processing bugs on series:")
-
-        for series in self.project.series:
-            printn(" %s" % series.name)
-            milestones = series.active_milestones
-            for (counter, task) in enumerate(series.searchTasks()):
-                if counter > self.trunc and self.trunc > 0:
-                    break
-                bug = task.bug
-                self.bug_issues.setdefault(bug.web_link, [])
-                if task.milestone not in milestones:
-                    try:
-                        milestone_name = task.milestone.name
-                    except Exception:
-                        milestone_name = None
-                    self.bug_issues[bug.web_link].append(
-                        "Incorrect milestone (%s) for %s" % (
-                            milestone_name, series.name
-                        )
-                    )
-                if series == self.current_series:
-                    self.bug_issues[bug.web_link].append(
-                        "Remove targeting to current series"
-                    )
-                pass
-        print()
-
     def bug_report(self):
         report = []
-        bugs = self.project.searchTasks()
+        bugs = self.project.searchTasks(status=all_bug_statuses)
         printn("Processing bugs (%d):" % len(bugs))
 
         for (counter, bug) in enumerate(bugs, 1):
@@ -242,6 +191,14 @@ class Report(object):
                 status = 'done'
             if bug.status == 'In Progress':
                 status = 'in progress'
+            triage = []
+            for task in bug.bug.bug_tasks:
+                series = task.target
+                if is_series(series):
+                    series = series.name
+                else:
+                    series = None
+                triage += self.checks.run(task, series)
             report.append({
                 'type': 'bug',
                 'link': bug.web_link.encode('utf-8'),
@@ -256,10 +213,7 @@ class Report(object):
                 'team': team.encode('utf-8'),
                 'assignee': assignee.encode('utf-8'),
                 'name': assignee_name.encode('utf-8'),
-                'triage': ', '.join(
-                    self.check_bug(bug) +
-                    self.bug_issues[bug.bug.web_link]
-                ).encode('utf-8'),
+                'triage': ', '.join(triage).encode('utf-8'),
             })
         print()
         return report

@@ -1,5 +1,4 @@
 project: fuel
-current_milestone: '5.1'
 # For debug. Proceed only limited amount of items in project
 trunc_report: 0
 cache_dir: cache

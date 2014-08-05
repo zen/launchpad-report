@@ -1,9 +1,9 @@
 <html>
 <head>
-<title>lp-report: {{ config.project }}-{{ config.current_milestone }}</title>
+<title>lp-report: {{ config.project }}</title>
 </head>
 <body>
-<h1>lp-report: {{ config.project }}-{{ config.current_milestone }}</h1>
+<h1>lp-report: {{ config.project }}</h1>
 <table>
 <tr>
 <th>&nbsp;</th>
@@ -19,7 +19,7 @@
 {% for item in rows %}
 <tr>
 <td>{{ item.type }}</td>
-<td><a href="{{ item.link }}">{{ item.title}}</a></td>
+<td><a href="{{ item.link }}">{{ item.title }}</a></td>
 <td>{{ item.milestone }}</td>
 <td>{{ item.status }}</td>
 <td>{{ item.priority }}</td>
