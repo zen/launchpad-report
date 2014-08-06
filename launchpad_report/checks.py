@@ -14,6 +14,12 @@ def is_bp(obj):
     )
 
 
+def is_project(obj):
+    return (
+        obj.resource_type_link ==
+        u'https://api.launchpad.net/devel/#project'
+    )
+
 class Checks(object):
     def __init__(self, mapping):
         self.mapping = mapping
@@ -26,41 +32,44 @@ class Checks(object):
         )
         actions = []
         for test in tests:
-            actions.append(getattr(Checks, test[0])(obj, series))
-        return actions
+            actions.append(getattr(Checks, test[0])(self, obj, series))
+        return filter(lambda x: x is not None, actions)
 
-    @staticmethod
-    def is_series_defined(obj, series):
+    def is_series_defined(self, obj, series):
         if is_bp(obj) and series is None:
             return "No series"
 
-    @staticmethod
-    def is_milestone_in_series(obj, series):
+    def is_milestone_in_series(self, obj, series):
         if obj.milestone is None:
             return "No milestone for series (%s)" % series
         if series is None:
             return  # There is another check for missed series
-        if obj.milestone.name not in Checks.mapping['milestones'][series]:
+        if (
+            self.mapping['milestones'].has_key(obj.milestone.name) and
+            self.mapping['milestones'][obj.milestone.name] != series):
             return ("Wrong milestone (%s) for series (%s)" % (
                 obj.milestone.name, series))
 
-    @staticmethod
-    def is_milestone_active(obj, series):
+    def is_milestone_active(self, obj, series):
+        if obj.milestone is None:
+            return
         if not obj.milestone.is_active and not obj.is_complete:
             return (
                 "Open and targeted to closed milestone (%s) on series (%s)" %
                 (obj.milestone.name, series)
             )
 
-    @staticmethod
-    def is_bug_targeted_to_focus_series(obj, series):
-        if is_bug(obj) and obj.target.development_focus.name == series:
+    def is_bug_targeted_to_focus_series(self, obj, series):
+        if (
+            is_bug(obj) and
+            is_project(obj.target) and
+            obj.target.development_focus.name == series
+            ):
             return (
                 "Targeted to the current development focus (%s)" %
                 series)
 
-    @staticmethod
-    def is_priority_set(obj, series):
+    def is_priority_set(self, obj, series):
         valid_bp_priorities = [
             'Essential', 'High', 'Medium', 'Low'
         ]
@@ -74,12 +83,10 @@ class Checks(object):
             return "Priority (%s) is not valid for series (%s)" % (
                 obj.importance, series)
 
-    @staticmethod
-    def is_assignee_set(obj, series):
+    def is_assignee_set(self, obj, series):
         if not obj.assignee:
             return "No assignee for series (%s)" % series
 
-    @staticmethod
-    def is_bug_confirmed(obj, series):
+    def is_bug_confirmed(self, obj, series):
         if is_bug(obj) and obj.status == 'New':
             return "Not confirmed for series (%s)" % series

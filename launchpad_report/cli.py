@@ -48,9 +48,6 @@ def main():
     else:
         report.generate()
 
-    # if params.output == '-':
-    #     print report.render()
-    # else:
     report.render2csv(params.outcsv)
     report.render2json(params.outjson)
     report.render2html(params.outhtml, params.template)
