@@ -110,6 +110,10 @@ def main():
         '-l', '--logfile', dest='logfile', action='store', type=str,
         help='Generate debug logfile'
     )
+    parser.add_argument(
+        '-a', '--all', dest='all', action='store_true', default=False,
+        help='Generate report both for open and closed bugs and blueprints'
+    )
     params, other_params = parser.parse_known_args()
 
     report = Report(
@@ -126,7 +130,7 @@ def main():
     if params.loadjson:
         report.load(params.loadjson)
     else:
-        report.generate()
+        report.generate(all=params.all)
 
     report.render2csv(params.outcsv)
     report.render2json(params.outjson)

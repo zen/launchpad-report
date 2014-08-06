@@ -5,20 +5,16 @@ import json
 from launchpadlib.launchpad import Launchpad
 import yaml
 
+from launchpad_report.checks import all_bug_statuses
 from launchpad_report.checks import Checks
+from launchpad_report.checks import open_bug_statuses
+from launchpad_report.checks import untriaged_bug_statuses
 from launchpad_report.render import CSVRenderer
 from launchpad_report.render import HTMLRenderer
 from launchpad_report.render import JSONRenderer
 from launchpad_report.utils import get_name
 from launchpad_report.utils import is_series
 from launchpad_report.utils import printn
-
-all_bug_statuses = [
-    'New', 'Incomplete', 'Opinion', 'Invalid', 'Won\'t Fix',
-    'Expired', 'Confirmed', 'Triaged', 'In Progress',
-    'Fix Committed', 'Fix Released', 'Incomplete (with response)',
-    'Incomplete (without response)'
-]
 
 
 class ConfigError(Exception):
@@ -60,15 +56,15 @@ class Report(object):
         jsonfile = open(filename)
         self.data = json.load(jsonfile)
 
-    def generate(self):
+    def generate(self, all=False):
         if self.project is None:
             raise ConfigError("No such project '%s'" % self.config['project'])
         self.checks = Checks(self.iter_series())
         self.data = {'rows': []}
         self.data['config'] = self.config
         self.bug_issues = {}
-        self.data['rows'] += self.bp_report()
-        self.data['rows'] += self.bug_report()
+        self.data['rows'] += self.bp_report(all=all)
+        self.data['rows'] += self.bug_report(all=all)
 
     def iter_series(self):
         print("Collecting series data:")
@@ -91,9 +87,12 @@ class Report(object):
             'milestones': self.milestones_series,
         }
 
-    def bp_report(self):
+    def bp_report(self, all=False):
         report = []
-        blueprints = self.project.all_specifications
+        if all:
+            blueprints = self.project.all_specifications
+        else:
+            blueprints = self.project.valid_specifications
         printn("Processing blueprints (%d):" % len(blueprints))
         for (counter, bp) in enumerate(blueprints, 1):
             if counter > self.trunc and self.trunc > 0:
@@ -145,9 +144,13 @@ class Report(object):
         print()
         return report
 
-    def bug_report(self):
+    def bug_report(self, all=False):
         report = []
-        bugs = self.project.searchTasks(status=all_bug_statuses)
+        if all:
+            bugs = self.project.searchTasks(status=all_bug_statuses)
+        else:
+            bugs = self.project.searchTasks(status=(
+                untriaged_bug_statuses + open_bug_statuses))
         printn("Processing bugs (%d):" % len(bugs))
 
         for (counter, bug) in enumerate(bugs, 1):
