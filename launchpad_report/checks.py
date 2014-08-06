@@ -1,24 +1,10 @@
 import inspect
 
+from launchpad_report.utils import get_name
+from launchpad_report.utils import is_bp
+from launchpad_report.utils import is_bug
+from launchpad_report.utils import is_project
 
-def is_bug(obj):
-    return (
-        obj.resource_type_link == u'https://api.launchpad.net/devel/#bug_task'
-    )
-
-
-def is_bp(obj):
-    return (
-        obj.resource_type_link ==
-        u'https://api.launchpad.net/devel/#specification'
-    )
-
-
-def is_project(obj):
-    return (
-        obj.resource_type_link ==
-        u'https://api.launchpad.net/devel/#project'
-    )
 
 class Checks(object):
     def __init__(self, mapping):
@@ -45,10 +31,11 @@ class Checks(object):
         if series is None:
             return  # There is another check for missed series
         if (
-            self.mapping['milestones'].has_key(obj.milestone.name) and
-            self.mapping['milestones'][obj.milestone.name] != series):
+            get_name(obj.milestone) in self.mapping['milestones'] and
+            self.mapping['milestones'][get_name(obj.milestone)] != series
+        ):
             return ("Wrong milestone (%s) for series (%s)" % (
-                obj.milestone.name, series))
+                get_name(obj.milestone), series))
 
     def is_milestone_active(self, obj, series):
         if obj.milestone is None:
@@ -56,15 +43,15 @@ class Checks(object):
         if not obj.milestone.is_active and not obj.is_complete:
             return (
                 "Open and targeted to closed milestone (%s) on series (%s)" %
-                (obj.milestone.name, series)
+                (get_name(obj.milestone), series)
             )
 
     def is_bug_targeted_to_focus_series(self, obj, series):
         if (
             is_bug(obj) and
             is_project(obj.target) and
-            obj.target.development_focus.name == series
-            ):
+            get_name(obj.target.development_focus) == series
+        ):
             return (
                 "Targeted to the current development focus (%s)" %
                 series)

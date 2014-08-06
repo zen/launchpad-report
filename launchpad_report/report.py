@@ -9,6 +9,8 @@ from launchpad_report.checks import Checks
 from launchpad_report.render import CSVRenderer
 from launchpad_report.render import HTMLRenderer
 from launchpad_report.render import JSONRenderer
+from launchpad_report.utils import get_name
+from launchpad_report.utils import is_series
 from launchpad_report.utils import printn
 
 all_bug_statuses = [
@@ -17,13 +19,6 @@ all_bug_statuses = [
     'Fix Committed', 'Fix Released', 'Incomplete (with response)',
     'Incomplete (without response)'
 ]
-
-
-def is_series(obj):
-    return (
-        obj.resource_type_link ==
-        u'https://api.launchpad.net/devel/#project_series'
-    )
 
 
 class ConfigError(Exception):
@@ -80,18 +75,17 @@ class Report(object):
         self.bps_series = {}
         self.milestones_series = {}
         for series in self.project.series:
-            printn(" %s" % series.name)
+            printn(" %s" % get_name(series))
             # Blueprints
             for (counter, bp) in enumerate(series.all_specifications):
-                self.bps_series.setdefault(bp.name, [])
-                self.bps_series[bp.name].append(series.name)
+                self.bps_series[get_name(bp)] = get_name(series)
             # Milestones
             for milestone in series.all_milestones:
-                self.milestones_series[milestone.name] = series.name
+                self.milestones_series[get_name(milestone)] = get_name(series)
         printn(" none")
         # Search for blueprints without series
         for (counter, bp) in enumerate(self.project.all_specifications):
-            self.bps_series.setdefault(bp.name, [None])
+            self.bps_series.setdefault(get_name(bp), None)
         print()
         return {
             'milestones': self.milestones_series,
@@ -111,12 +105,12 @@ class Report(object):
             assignee = 'unassigned'
             assignee_name = 'unassigned'
             try:
-                assignee = bp.assignee.name
+                assignee = get_name(bp.assignee)
                 assignee_name = bp.assignee.display_name
             except Exception:
                 pass
             if bp.milestone:
-                milestone = bp.milestone.name
+                milestone = get_name(bp.milestone)
             else:
                 milestone = 'None'
             team = 'unknown'
@@ -130,7 +124,7 @@ class Report(object):
                 status = 'backlog'
             if bp.is_complete:
                 status = 'done'
-            triage = self.checks.run(bp, self.bps_series[bp.name])
+            triage = self.checks.run(bp, self.bps_series[get_name(bp)])
             report.append({
                 'type': 'bp',
                 'link': bp.web_link.encode('utf-8'),
@@ -139,7 +133,7 @@ class Report(object):
                 ].encode('utf-8'),
                 'title': bp.title.encode('utf-8'),
                 'milestone': milestone,
-                'series': self.bps_series[bp.name],
+                'series': self.bps_series[get_name(bp)],
                 'status': bp.implementation_status,
                 'short_status': status,
                 'priority': bp.priority,
@@ -166,12 +160,12 @@ class Report(object):
             assignee = 'unassigned'
             assignee_name = 'unassigned'
             try:
-                assignee = bug.assignee.name
+                assignee = get_name(bug.assignee)
                 assignee_name = bug.assignee.display_name
             except Exception:
                 pass
             if bug.milestone:
-                milestone = bug.milestone.name
+                milestone = get_name(bug.milestone)
             else:
                 milestone = 'None'
             team = 'unknown'
@@ -195,7 +189,7 @@ class Report(object):
             for task in bug.bug.bug_tasks:
                 series = task.target
                 if is_series(series):
-                    series = series.name
+                    series = get_name(series)
                 else:
                     series = None
                 triage += self.checks.run(task, series)
