@@ -11,6 +11,7 @@ from launchpad_report.utils import is_bp
 from launchpad_report.utils import is_bug
 from launchpad_report.utils import is_project
 from launchpad_report.utils import rejected_bp_def_statuses
+from launchpad_report.utils import rejected_bug_statuses
 from launchpad_report.utils import untriaged_bug_statuses
 from launchpad_report.utils import valid_bp_priorities
 from launchpad_report.utils import valid_bug_priorities
@@ -31,7 +32,7 @@ class Checks(object):
             actions.append(getattr(Checks, test[0])(self, obj, series))
         return filter(lambda x: x is not None, actions)
 
-    def is_series_defined(self, obj, series):
+    def is_bp_series_defined(self, obj, series):
         if is_bp(obj) and series is None:
             return "No series"
 
@@ -92,6 +93,8 @@ class Checks(object):
     def is_priority_set(self, obj, series):
         if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
             return
+        if (is_bug(obj) and obj.status in rejected_bug_statuses):
+            return
         if is_bp(obj) and obj.priority not in valid_bp_priorities:
             return "Priority (%s) is not valid for series (%s)" % (
                 obj.priority, series)
@@ -101,6 +104,8 @@ class Checks(object):
 
     def is_assignee_set(self, obj, series):
         if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
+        if (is_bug(obj) and obj.status in rejected_bug_statuses):
             return
         if not obj.assignee:
             return "No assignee for series (%s)" % series
