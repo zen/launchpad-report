@@ -5,16 +5,17 @@ import json
 from launchpadlib.launchpad import Launchpad
 import yaml
 
-from launchpad_report.checks import all_bug_statuses
 from launchpad_report.checks import Checks
-from launchpad_report.checks import open_bug_statuses
-from launchpad_report.checks import untriaged_bug_statuses
 from launchpad_report.render import CSVRenderer
 from launchpad_report.render import HTMLRenderer
 from launchpad_report.render import JSONRenderer
+from launchpad_report.utils import all_bug_statuses
 from launchpad_report.utils import get_name
 from launchpad_report.utils import is_series
+from launchpad_report.utils import open_bug_statuses
 from launchpad_report.utils import printn
+from launchpad_report.utils import short_status
+from launchpad_report.utils import untriaged_bug_statuses
 
 
 class ConfigError(Exception):
@@ -113,16 +114,9 @@ class Report(object):
             else:
                 milestone = 'None'
             team = 'unknown'
-            status = 'error'
             for t in self.teams.keys():
                 if assignee in self.teams[t]:
                     team = t
-            if bp.is_started and not bp.is_complete:
-                status = 'in progress'
-            if not bp.is_started and not bp.is_complete:
-                status = 'backlog'
-            if bp.is_complete:
-                status = 'done'
             triage = self.checks.run(bp, self.bps_series[get_name(bp)])
             report.append({
                 'type': 'bp',
@@ -134,7 +128,7 @@ class Report(object):
                 'milestone': milestone,
                 'series': self.bps_series[get_name(bp)],
                 'status': bp.implementation_status,
-                'short_status': status,
+                'short_status': short_status(bp),
                 'priority': bp.priority,
                 'team': team.encode('utf-8'),
                 'assignee': assignee.encode('utf-8'),
@@ -172,22 +166,11 @@ class Report(object):
             else:
                 milestone = 'None'
             team = 'unknown'
-            status = 'backlog'
             self.bug_issues.setdefault(bug.bug.web_link, [])
             for t in self.teams.keys():
                 if assignee in self.teams[t]:
                     team = t
             title = bug.bug.title
-            if bug.is_complete:
-                status = 'done'
-            if (
-                bug.status == 'Fix Committed' or
-                bug.status == 'Fix Released' or
-                bug.status == 'Incomplete'
-            ):
-                status = 'done'
-            if bug.status == 'In Progress':
-                status = 'in progress'
             triage = []
             for task in bug.bug.bug_tasks:
                 series = task.target
@@ -205,7 +188,7 @@ class Report(object):
                 'title': title.encode('utf-8'),
                 'milestone': milestone,
                 'status': bug.status,
-                'short_status': status,
+                'short_status': short_status(bug),
                 'priority': bug.importance,
                 'team': team.encode('utf-8'),
                 'assignee': assignee.encode('utf-8'),

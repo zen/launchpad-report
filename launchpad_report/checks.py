@@ -1,38 +1,19 @@
 import inspect
 
+# from launchpad_report.utils import all_bug_statuses
+# from launchpad_report.utils import open_bug_statuses
+# from launchpad_report.utils import rejected_bug_statuses
+# from launchpad_report.utils import untriaged_bp_def_statuses
+from launchpad_report.utils import closed_bp_statuses
+from launchpad_report.utils import closed_bug_statuses
 from launchpad_report.utils import get_name
 from launchpad_report.utils import is_bp
 from launchpad_report.utils import is_bug
 from launchpad_report.utils import is_project
-
-
-untriaged_bug_statuses = [
-    'New',
-]
-
-open_bug_statuses = [
-    'Incomplete', 'Confirmed', 'Triaged', 'In Progress',
-    'Incomplete (with response)', 'Incomplete (without response)',
-]
-
-closed_bug_statuses = [
-    'Opinion', 'Invalid', 'Won\'t Fix', 'Expired', 'Fix Committed',
-    'Fix Released',
-]
-
-all_bug_statuses = (
-    untriaged_bug_statuses + open_bug_statuses + closed_bug_statuses
-)
-
-closed_bp_statuses = ['Implemented']
-
-valid_bp_priorities = [
-    'Essential', 'High', 'Medium', 'Low'
-]
-
-valid_bug_priorities = [
-    'Critical', 'High', 'Medium', 'Low', 'Wishlist'
-]
+from launchpad_report.utils import rejected_bp_def_statuses
+from launchpad_report.utils import untriaged_bug_statuses
+from launchpad_report.utils import valid_bp_priorities
+from launchpad_report.utils import valid_bug_priorities
 
 
 class Checks(object):
@@ -54,7 +35,20 @@ class Checks(object):
         if is_bp(obj) and series is None:
             return "No series"
 
+    def is_rejected_bp_has_milestone(self, obj, series):
+        if (
+            is_bp(obj) and
+            obj.definition_status in rejected_bp_def_statuses and
+            obj.milestone is not None
+        ):
+            return (
+                "Rejected blueprint has milestone (%s) for series (%s)" %
+                (obj.milestone.name, series)
+            )
+
     def is_milestone_in_series(self, obj, series):
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
         if obj.milestone is None:
             return "No milestone for series (%s)" % series
         if series is None:
@@ -67,9 +61,11 @@ class Checks(object):
                 get_name(obj.milestone), series))
 
     def is_milestone_active(self, obj, series):
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
         if obj.milestone is None:
             return
-        if not obj.milestone.is_active:
+        if obj.milestone.is_active:
             return
         if (
             (is_bug(obj) and obj.status not in closed_bug_statuses) or
@@ -94,6 +90,8 @@ class Checks(object):
                 series)
 
     def is_priority_set(self, obj, series):
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
         if is_bp(obj) and obj.priority not in valid_bp_priorities:
             return "Priority (%s) is not valid for series (%s)" % (
                 obj.priority, series)
@@ -102,6 +100,8 @@ class Checks(object):
                 obj.importance, series)
 
     def is_assignee_set(self, obj, series):
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
         if not obj.assignee:
             return "No assignee for series (%s)" % series
 
@@ -110,11 +110,21 @@ class Checks(object):
             return "Not confirmed for series (%s)" % series
 
     def is_bp_in_unknown_status(self, obj, series):
-        if is_bp(obj) and obj.implementation_status == 'Unknown':
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
+        if (
+            is_bp(obj) and
+            obj.implementation_status == 'Unknown'
+        ):
             return "Status unknown for series (%s)" % series
 
     def is_bp_done_but_unapproved(self, obj, series):
-        if is_bp(obj) and obj.implementation_status in closed_bp_statuses:
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
+        if (
+            is_bp(obj) and
+            obj.implementation_status in closed_bp_statuses
+        ):
             if (
                 obj.definition_status != 'Approved' or
                 obj.direction_approved is not True
@@ -122,6 +132,8 @@ class Checks(object):
                 return "Implemented, but not approved for series (%s)" % series
 
     def is_bp_semiapproved(self, obj, series):
+        if (is_bp(obj) and obj.definition_status in rejected_bp_def_statuses):
+            return
         if (
             is_bp(obj) and
             obj.definition_status == 'Approved' and

@@ -1,6 +1,45 @@
 import logging
 import sys
 
+
+untriaged_bug_statuses = [
+    'New',
+]
+
+open_bug_statuses = [
+    'Incomplete', 'Confirmed', 'Triaged', 'In Progress',
+    'Incomplete (with response)', 'Incomplete (without response)',
+]
+
+rejected_bug_statuses = [
+    'Opinion', 'Invalid', 'Won\'t Fix', 'Expired',
+]
+
+closed_bug_statuses = [
+    'Fix Committed', 'Fix Released',
+] + rejected_bug_statuses
+
+all_bug_statuses = (
+    untriaged_bug_statuses + open_bug_statuses + closed_bug_statuses
+)
+
+untriaged_bp_def_statuses = [
+    'New',
+]
+
+rejected_bp_def_statuses = ['Superseded', 'Obsolete']
+
+closed_bp_statuses = ['Implemented']
+
+valid_bp_priorities = [
+    'Essential', 'High', 'Medium', 'Low'
+]
+
+valid_bug_priorities = [
+    'Critical', 'High', 'Medium', 'Low', 'Wishlist'
+]
+
+
 logger = logging.getLogger(__name__)
 
 cached_names = {
@@ -32,6 +71,26 @@ def is_series(obj):
         obj.resource_type_link ==
         u'https://api.launchpad.net/devel/#project_series'
     )
+
+
+def short_status(obj):
+    if is_bp(obj):
+        if obj.definition_status in rejected_bp_def_statuses:
+            return 'rejected'
+        if obj.definition_status in untriaged_bp_def_statuses:
+            return 'untriaged'
+        if obj.implementation_status in closed_bp_statuses:
+            return 'done'
+        return 'open'
+    if is_bug(obj):
+        if obj.status in rejected_bug_statuses:
+            return 'rejected'
+        if obj.status in untriaged_bug_statuses:
+            return 'untriaged'
+        if obj.status in closed_bug_statuses:
+            return 'done'
+        return 'open'
+    return 'unknown'
 
 
 def get_name(obj):
