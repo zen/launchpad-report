@@ -23,6 +23,10 @@ all_bug_statuses = (
     untriaged_bug_statuses + open_bug_statuses + closed_bug_statuses
 )
 
+untriaged_bp_statuses = [
+    'Unknown',
+]
+
 untriaged_bp_def_statuses = [
     'New',
 ]
@@ -77,18 +81,27 @@ def short_status(obj):
     if is_bp(obj):
         if obj.definition_status in rejected_bp_def_statuses:
             return 'rejected'
-        if obj.definition_status in untriaged_bp_def_statuses:
-            return 'untriaged'
         if obj.implementation_status in closed_bp_statuses:
             return 'done'
+        if (
+            obj.definition_status in untriaged_bp_def_statuses or
+            obj.assignee is None or
+            obj.priority not in valid_bp_priorities or
+            obj.implementation_status in untriaged_bp_statuses
+        ):
+            return 'untriaged'
         return 'open'
     if is_bug(obj):
         if obj.status in rejected_bug_statuses:
             return 'rejected'
-        if obj.status in untriaged_bug_statuses:
-            return 'untriaged'
         if obj.status in closed_bug_statuses:
             return 'done'
+        if (
+            obj.status in untriaged_bug_statuses:
+            obj.assignee is None or
+            obj.importance not in valid_bug_priorites
+        ):
+            return 'untriaged'
         return 'open'
     return 'unknown'
 
