@@ -97,9 +97,9 @@ def short_status(obj):
         if obj.status in closed_bug_statuses:
             return 'done'
         if (
-            obj.status in untriaged_bug_statuses:
+            obj.status in untriaged_bug_statuses or
             obj.assignee is None or
-            obj.importance not in valid_bug_priorites
+            obj.importance not in valid_bug_priorities
         ):
             return 'untriaged'
         return 'open'
