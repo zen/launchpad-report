@@ -32,6 +32,7 @@ teams:
     bogdando
     vkuklin
     sbogatkin
+    xdeller
   l2:
     manashkin
     ekozhemyakin
@@ -71,6 +72,21 @@ teams:
     mos-ceilometer
     mos-oslo
     mos-sahara
+    mos-heat
     iberezovskiy
+    e0ne
+    dmitrymex
+    smurashov
   partners:
     izinovik
+    gcon-monolake
+    igajsin
+    moshele
+  poland:
+    tzn
+    salmon
+    ksambor
+    prmtl
+    loles
+  external:
+    longgeek
