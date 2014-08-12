@@ -9,7 +9,7 @@ from launchpad_report.utils import closed_bug_statuses
 from launchpad_report.utils import get_name
 from launchpad_report.utils import is_bp
 from launchpad_report.utils import is_bug
-from launchpad_report.utils import is_project
+from launchpad_report.utils import is_series
 from launchpad_report.utils import rejected_bp_def_statuses
 from launchpad_report.utils import rejected_bug_statuses
 from launchpad_report.utils import untriaged_bug_statuses
@@ -83,8 +83,8 @@ class Checks(object):
     def is_bug_targeted_to_focus_series(self, obj, series):
         if (
             is_bug(obj) and
-            is_project(obj.target) and
-            get_name(obj.target.development_focus) == series
+            is_series(obj.target) and
+            get_name(obj.target.project.development_focus) == series
         ):
             return (
                 "Targeted to the current development focus (%s)" %

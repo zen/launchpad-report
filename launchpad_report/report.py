@@ -176,8 +176,12 @@ class Report(object):
                 series = task.target
                 if is_series(series):
                     series = get_name(series)
+                    if task.target.project != self.project:
+                        continue
                 else:
                     series = None
+                    if task.target != self.project:
+                        continue
                 triage += self.checks.run(task, series)
             report.append({
                 'type': 'bug',
