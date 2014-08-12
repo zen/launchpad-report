@@ -15,6 +15,7 @@ teams:
     akislitsky
     kozhukalov
     lux-place
+    a-gordeev
   ui:
     fuel-ui
     vkramskikh
@@ -33,6 +34,10 @@ teams:
     vkuklin
     sbogatkin
     xdeller
+    andreika-mail
+    mmaxur
+    maxmazurenka
+
   l2:
     manashkin
     ekozhemyakin
@@ -82,6 +87,7 @@ teams:
     gcon-monolake
     igajsin
     moshele
+    aviramb
   poland:
     tzn
     salmon
