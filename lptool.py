@@ -1,4 +1,4 @@
-from __future__ import print_fuction
+from __future__ import print_function
 
 import argparse
 from launchpadlib.launchpad import Launchpad
@@ -88,8 +88,16 @@ def update_bug(item_id, params):
             item_id, params.milestone
         ))
         if params.milestone != 'None':
+            milestone = prj.getMilestone(name=params.milestone)
+            is_active = milestone.is_active
+            if not is_active:
+                milestone.is_active = True
+                milestone.lp_save()
             bug_task.milestone = prj.getMilestone(name=params.milestone)
             bug_task.lp_save()
+            if not is_active:
+                milestone.is_active = False
+                milestone.lp_save()
         else:
             bug.milestone = None
             bug.lp_save()
@@ -100,7 +108,7 @@ def update_bug(item_id, params):
     if params.create:
         bug.addTask(target=series)
     if params.delete:
-        bug_task.delete()
+        bug_task.lp_delete()
     if params.priority:
         print("TODO")
     if params.status:
