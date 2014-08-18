@@ -22,20 +22,28 @@ a:visited {
 </style>
 </head>
 <body>
-<h1>lp-report: triage actions for {{ config.project }}</h1>
-<h2>Blueprints</h2>
+    <h1>lp-report: {{ config.project }}</h1>
+<h2>Triage actions</h2>
+<h3>Blueprints</h3>
 <ul>
     <li><a href="#bp-done">Closed blueprints</a></li>
     <li><a href="#bp-open">Open blueprints</a></li>
     <li><a href="#bp-rejected">Rejected blueprints</a></li>
     <li><a href="#bp-untriaged">Untriaged blueprints</a></li>
 </ul>
-<h2>Bugs</h2>
+<h3>Bugs</h3>
 <ul>
     <li><a href="#bug-done">Closed bugs</a></li>
     <li><a href="#bug-open">Open bugs</a></li>
     <li><a href="#bug-rejected">Rejected bugs</a></li>
     <li><a href="#bug-untriaged">Untriaged bugs</a></li>
+</ul>
+<h1>Bugs on teams</h1>
+<ul>
+{% set team_groups = rows|groupby('team') %}
+{% for team in team_groups %}
+    <li><a href="#team-{{ team.grouper }}">{{ team.grouper }}</a></li>
+{% endfor %}
 </ul>
 <table>
 {% for type_group in rows|groupby('type') %}
@@ -70,5 +78,39 @@ a:visited {
 {% endfor %}
 {% endfor %}
 </table>
+{% for team_group in team_groups %}
+<h3><a name="team-{{ team_group.grouper }}">{{ team_group.grouper }}</a></h3>
+<table>
+{% for status_group in team_group.list|groupby('short_status') %}
+{% if status_group.grouper in ['open', 'untriaged'] %}
+<tr><th colspan="8"> {{ status_group.grouper }} {{ team_group.grouper }}</th></tr>
+<tr>
+<th>Title</th>
+<th>Milestone</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Team</th>
+<th>Assignee</th>
+<th>Full Name</th>
+<th>Required triage actions</th>
+</tr>
+{% for item in status_group.list|sort(attribute='milestone') %}
+{% if item.type == "bug" %}
+<tr>
+<td><a href="{{ item.link }}">{{ item.title }}</a></td>
+<td>{{ item.milestone }}</td>
+<td>{{ item.status }}</td>
+<td>{{ item.priority }}</td>
+<td>{{ item.team }}</td>
+<td>{{ item.assignee }}</td>
+<td>{{ item.name }}</td>
+<td>{{ item.triage }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+</table>
+{% endfor %}
 </body>
 </html>
