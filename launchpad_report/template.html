@@ -1,15 +1,51 @@
 <html>
 <head>
 <title>lp-report: {{ config.project }}</title>
+<style>
+table {
+    border-collapse: collapse;
+}
+td, th {
+    border: solid #999 1px;
+    padding: 3px 7px 2px 7px;
+}
+th, th > a {
+    background-color: #eee;
+    color: #333;
+}
+a {
+    color: black;
+}
+a:visited {
+    color: #666;
+}
+</style>
 </head>
 <body>
-<h1>lp-report: {{ config.project }}</h1>
+<h1>lp-report: triage actions for {{ config.project }}</h1>
+<h2>Blueprints</h2>
+<ul>
+    <li><a href="#bp-done">Closed blueprints</a></li>
+    <li><a href="#bp-open">Open blueprints</a></li>
+    <li><a href="#bp-rejected">Rejected blueprints</a></li>
+    <li><a href="#bp-untriaged">Untriaged blueprints</a></li>
+</ul>
+<h2>Bugs</h2>
+<ul>
+    <li><a href="#bug-done">Closed bugs</a></li>
+    <li><a href="#bug-open">Open bugs</a></li>
+    <li><a href="#bug-rejected">Rejected bugs</a></li>
+    <li><a href="#bug-untriaged">Untriaged bugs</a></li>
+</ul>
 <table>
+{% for type_group in rows|groupby('type') %}
+{% for status_group in type_group.list|groupby('short_status') %}
+<tr><th colspan="8"><a name="{{ type_group.grouper }}-{{ status_group.grouper }}">
+    {{ status_group.grouper }} {{ type_group.grouper }}s
+</a></th></tr>
 <tr>
-<th>&nbsp;</th>
 <th>Title</th>
 <th>Milestone</th>
-<th>Short status</th>
 <th>Status</th>
 <th>Priority</th>
 <th>Team</th>
@@ -17,12 +53,11 @@
 <th>Full Name</th>
 <th>Required triage actions</th>
 </tr>
-{% for item in rows %}
+{% for item in status_group.list|sort(attribute='milestone') %}
+{% if item.triage %}
 <tr>
-<td>{{ item.type }}</td>
 <td><a href="{{ item.link }}">{{ item.title }}</a></td>
 <td>{{ item.milestone }}</td>
-<td>{{ item.short_status }}</td>
 <td>{{ item.status }}</td>
 <td>{{ item.priority }}</td>
 <td>{{ item.team }}</td>
@@ -30,6 +65,9 @@
 <td>{{ item.name }}</td>
 <td>{{ item.triage }}</td>
 </tr>
+{% endif %}
+{% endfor %}
+{% endfor %}
 {% endfor %}
 </table>
 </body>
