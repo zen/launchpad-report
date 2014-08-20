@@ -70,8 +70,13 @@ teams:
     rmoe
     xarses
     dreidellhasa
-  mos:
+  moslinux:
     mos-linux
+    apodrepniy
+    kdanylov
+    msemenov
+    asheplyakov
+  mosopenstack:
     mos-neutron
     mos-nova
     mos-horizon
@@ -79,16 +84,39 @@ teams:
     mos-oslo
     mos-sahara
     mos-heat
+    mos-murano
     iberezovskiy
     e0ne
     dmitrymex
     smurashov
+    rpodolyaka
+    skolekonov
+    vrovachev
+    ylobankov
+    alexei-kornienko
+    aepifanov
+    akamyshnikova
+    dbelova
+    efedorova
+    enikanorov
+    iyozhikov
+    shakhat
+    mdurnosvistov
+    ruhe
+    smelikyan
+    skolekonov
+    skraynev
+    sreshetniak
+    tnurlygayanov
+    tsufiev-x
+    yorik-sar
   partners:
     izinovik
     gcon-monolake
     igajsin
     moshele
     aviramb
+    srogov
   poland:
     tzn
     salmon
@@ -97,3 +125,11 @@ teams:
     loles
   external:
     longgeek
+    berendt
+    jesse-pretorius
+    sammiestoel
+  other_mirantis:
+    zynzel
+    vpleshakov
+    vdenisov
+    nikishov-da
