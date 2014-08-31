@@ -1,8 +1,8 @@
-import argparse
-from launchpad_report.report import Report
 import logging
 import os
 import sys
+import argparse
+from launchpad_report.report import Report
 
 import httplib
 import traceback
@@ -72,7 +72,6 @@ httplib.HTTPConnection.request = my_request
 
 # /http_magic
 
-
 def main():
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -135,3 +134,6 @@ def main():
     report.render2csv(params.outcsv)
     report.render2json(params.outjson)
     report.render2html(params.outhtml, params.template)
+
+if __name__ == "__main__":
+    main()

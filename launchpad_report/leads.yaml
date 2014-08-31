@@ -4,7 +4,7 @@ trunc_report: 0
 cache_dir: cache
 use_auth: True
 teams:
-  python:
+  dpyzhov:
     fuel-python
     alekseyk-ru
     dshulyak
@@ -15,44 +15,39 @@ teams:
     akislitsky
     kozhukalov
     lux-place
-    a-gordeev
-  ui:
+  vkramskikh:
     fuel-ui
     vkramskikh
     astepanchuk
     bdudko
     kpimenova
     jkirnosova
-  library:
+  vkuklin:
     fuel-library
-    sgolovatiuk
+    fuel-astute
+    vsharshov
+    a-gordeev
     xenolog
     adidenko
     raytrac3r
     idv1985
-    bogdando
     vkuklin
     sbogatkin
     xdeller
     andreika-mail
-    mmaxur
-    maxmazurenka
-  l2:
+  manashkin:
     manashkin
     ekozhemyakin
     akolesnikov
     fsoppelsa
-  astute:
-    fuel-astute
-    vsharshov
-  osci:
+  rvyalov:
     fuel-osci
     sotpuschennikov
     dburmistrov
     vparakhin
     r0mikiam
     mrasskazov
-  qa:
+  aurlapova:
     fuel-qa
     apalkina
     aurlapova
@@ -60,25 +55,25 @@ teams:
     asledzinskiy
     apanchenko-8
     ykotko
-  devops:
+  ishishkin:
     fuel-devops
     afedorova
     teran
     acharykov
-  us:
+  dborodaenko:
     dborodaenko
     rmoe
     xarses
     dreidellhasa
     docaedo
-  moslinux:
+  msemenov:
     mos-linux
     apodrepniy
     kdanylov
     msemenov
     asheplyakov
     asyriy
-  mosopenstack:
+  imarnat:
     mos-neutron
     mos-nova
     mos-horizon
@@ -112,7 +107,9 @@ teams:
     tnurlygayanov
     tsufiev-x
     yorik-sar
-  partners:
+    mmaxur
+    maxmazurenka
+  eshumakher:
     eshumakher
     izinovik
     gcon-monolake
@@ -120,12 +117,14 @@ teams:
     moshele
     aviramb
     srogov
-  poland:
+  tnapierala:
     tzn
     salmon
     ksambor
     prmtl
     loles
+    sgolovatiuk
+    bogdando
   external:
     longgeek
     berendt

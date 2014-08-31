@@ -64,7 +64,7 @@ class Report(object):
         self.data = {'rows': []}
         self.data['config'] = self.config
         self.bug_issues = {}
-        self.data['rows'] += self.bp_report(all=all)
+        #self.data['rows'] += self.bp_report(all=all)
         self.data['rows'] += self.bug_report(all=all)
 
     def iter_series(self):
@@ -74,15 +74,15 @@ class Report(object):
         for series in self.project.series:
             printn(" %s" % get_name(series))
             # Blueprints
-            for (counter, bp) in enumerate(series.all_specifications):
-                self.bps_series[get_name(bp)] = get_name(series)
+            #for (counter, bp) in enumerate(series.all_specifications):
+                #self.bps_series[get_name(bp)] = get_name(series)
             # Milestones
             for milestone in series.all_milestones:
                 self.milestones_series[get_name(milestone)] = get_name(series)
         printn(" none")
         # Search for blueprints without series
-        for (counter, bp) in enumerate(self.project.all_specifications):
-            self.bps_series.setdefault(get_name(bp), None)
+        #for (counter, bp) in enumerate(self.project.all_specifications):
+            #self.bps_series.setdefault(get_name(bp), None)
         print()
         return {
             'milestones': self.milestones_series,
@@ -140,64 +140,70 @@ class Report(object):
 
     def bug_report(self, all=False):
         report = []
+        milestone51 = self.project.series[4].all_milestones[1]  # 5.1
+        milestone502 = self.project.series[3].all_milestones[1] # 5.0.2
         if all:
             bugs = self.project.searchTasks(status=all_bug_statuses)
         else:
-            bugs = self.project.searchTasks(status=(
-                untriaged_bug_statuses + open_bug_statuses))
-        printn("Processing bugs (%d):" % len(bugs))
+            bugs51 = self.project.searchTasks(status=(
+                untriaged_bug_statuses + open_bug_statuses), milestone=milestone51)
+            bugs502 = self.project.searchTasks(status=(
+                untriaged_bug_statuses + open_bug_statuses), milestone=milestone502)
+        #import pdb; pdb.set_trace()
+        printn("Processing bugs (%d):" % (len(bugs51) + len(bugs502)))
 
-        for (counter, bug) in enumerate(bugs, 1):
-            if counter > self.trunc and self.trunc > 0:
-                break
-            if counter % 200 == 10:
-                print()
-            if counter % 10 == 0:
-                printn("%4d" % counter)
-            assignee = 'unassigned'
-            assignee_name = 'unassigned'
-            try:
-                assignee = get_name(bug.assignee)
-                assignee_name = bug.assignee.display_name
-            except Exception:
-                pass
-            if bug.milestone:
-                milestone = get_name(bug.milestone)
-            else:
-                milestone = 'None'
-            team = 'unknown'
-            self.bug_issues.setdefault(bug.bug.web_link, [])
-            for t in self.teams.keys():
-                if assignee in self.teams[t]:
-                    team = t
-            title = bug.bug.title
-            triage = []
-            for task in bug.bug.bug_tasks:
-                series = task.target
-                if is_series(series):
-                    series = get_name(series)
-                    if task.target.project != self.project:
-                        continue
+        for bugs in (bugs51, bugs502):
+            for (counter, bug) in enumerate(bugs, 1):
+                if counter > self.trunc and self.trunc > 0:
+                    break
+                if counter % 200 == 10:
+                    print()
+                if counter % 10 == 0:
+                    printn("%4d" % counter)
+                assignee = 'unassigned'
+                assignee_name = 'unassigned'
+                try:
+                    assignee = get_name(bug.assignee)
+                    assignee_name = bug.assignee.display_name
+                except Exception:
+                    pass
+                if bug.milestone:
+                    milestone = get_name(bug.milestone)
                 else:
-                    series = None
-                    if task.target != self.project:
-                        continue
-                triage += self.checks.run(task, series)
-            report.append({
-                'type': 'bug',
-                'link': bug.web_link.encode('utf-8'),
-                'id': bug.web_link[
-                    bug.web_link.rfind('/') + 1:
-                ].encode('utf-8'),
-                'title': title.encode('utf-8'),
-                'milestone': milestone,
-                'status': bug.status,
-                'short_status': short_status(bug),
-                'priority': bug.importance,
-                'team': team.encode('utf-8'),
-                'assignee': assignee.encode('utf-8'),
-                'name': assignee_name.encode('utf-8'),
-                'triage': ', '.join(triage).encode('utf-8'),
-            })
+                    milestone = 'None'
+                team = 'unknown'
+                self.bug_issues.setdefault(bug.bug.web_link, [])
+                for t in self.teams.keys():
+                    if assignee in self.teams[t]:
+                        team = t
+                title = bug.bug.title
+                triage = []
+                for task in bug.bug.bug_tasks:
+                    series = task.target
+                    if is_series(series):
+                        series = get_name(series)
+                        if task.target.project != self.project:
+                            continue
+                    else:
+                        series = None
+                        if task.target != self.project:
+                            continue
+                    triage += self.checks.run(task, series)
+                report.append({
+                    'type': 'bug',
+                    'link': bug.web_link.encode('utf-8'),
+                    'id': bug.web_link[
+                        bug.web_link.rfind('/') + 1:
+                    ].encode('utf-8'),
+                    'title': title.encode('utf-8'),
+                    'milestone': milestone,
+                    'status': bug.status,
+                    'short_status': short_status(bug),
+                    'priority': bug.importance,
+                    'team': team.encode('utf-8'),
+                    'assignee': assignee.encode('utf-8'),
+                    'name': assignee_name.encode('utf-8'),
+                    'triage': ', '.join(triage).encode('utf-8'),
+                })
         print()
         return report
