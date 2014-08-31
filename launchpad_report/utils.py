@@ -11,6 +11,10 @@ open_bug_statuses = [
     'Incomplete (with response)', 'Incomplete (without response)',
 ]
 
+open_bug_statuses_for_HCF = [
+    'Confirmed', 'Triaged', 'In Progress',
+]
+
 rejected_bug_statuses = [
     'Opinion', 'Invalid', 'Won\'t Fix', 'Expired',
 ]

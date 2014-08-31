@@ -1,4 +1,5 @@
-project: fuel
+project:
+  - fuel
 # For debug. Proceed only limited amount of items in project
 trunc_report: 0
 cache_dir: cache
@@ -109,6 +110,7 @@ teams:
     yorik-sar
     mmaxur
     maxmazurenka
+    teselkin-d
   eshumakher:
     eshumakher
     izinovik

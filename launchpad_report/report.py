@@ -13,6 +13,7 @@ from launchpad_report.utils import all_bug_statuses
 from launchpad_report.utils import get_name
 from launchpad_report.utils import is_series
 from launchpad_report.utils import open_bug_statuses
+from launchpad_report.utils import open_bug_statuses_for_HCF
 from launchpad_report.utils import printn
 from launchpad_report.utils import short_status
 from launchpad_report.utils import untriaged_bug_statuses
@@ -41,7 +42,12 @@ class Report(object):
             lp = Launchpad.login_anonymously(
                 'lp-report-bot', 'production', version='devel'
             )
-        self.project = lp.projects[self.config['project']]
+        #import pdb; pdb.set_trace()
+        self.projects = [lp.projects[prj] for prj in self.config['project']]
+
+        # for backward compatibility
+        #self.project = lp.projects[self.config['project'][0]]
+
         self.blueprint_series = {}
 
     def render2html(self, filename, template_filename):
@@ -58,34 +64,33 @@ class Report(object):
         self.data = json.load(jsonfile)
 
     def generate(self, all=False):
-        if self.project is None:
-            raise ConfigError("No such project '%s'" % self.config['project'])
-        self.checks = Checks(self.iter_series())
         self.data = {'rows': []}
-        self.data['config'] = self.config
         self.bug_issues = {}
-        #self.data['rows'] += self.bp_report(all=all)
-        self.data['rows'] += self.bug_report(all=all)
+        self.data['config'] = self.config
+        for project in self.projects:
+            self.checks = Checks(self.iter_series(project))
+            #self.data['rows'] += self.bp_report(all=all)
+            self.data['rows'] += self.bug_report(project, all=all)
 
-    def iter_series(self):
-        print("Collecting series data:")
+    def iter_series(self, project):
+        print("Collecting series data for %s:" % project)
         self.bps_series = {}
-        self.milestones_series = {}
-        for series in self.project.series:
+        milestones_series = {}
+        for series in project.series:
             printn(" %s" % get_name(series))
             # Blueprints
             #for (counter, bp) in enumerate(series.all_specifications):
                 #self.bps_series[get_name(bp)] = get_name(series)
             # Milestones
             for milestone in series.all_milestones:
-                self.milestones_series[get_name(milestone)] = get_name(series)
+                milestones_series[get_name(milestone)] = get_name(series)
         printn(" none")
         # Search for blueprints without series
         #for (counter, bp) in enumerate(self.project.all_specifications):
             #self.bps_series.setdefault(get_name(bp), None)
         print()
         return {
-            'milestones': self.milestones_series,
+            'milestones': milestones_series,
         }
 
     def bp_report(self, all=False):
@@ -138,18 +143,33 @@ class Report(object):
         print()
         return report
 
-    def bug_report(self, all=False):
+    def bug_report(self, project, all=False):
         report = []
-        milestone51 = self.project.series[4].all_milestones[1]  # 5.1
-        milestone502 = self.project.series[3].all_milestones[1] # 5.0.2
+        milestone51 = project.getMilestone(name="5.1")    # 5.1
+        milestone502 = project.getMilestone(name="5.0.2") # 5.0.2
         if all:
-            bugs = self.project.searchTasks(status=all_bug_statuses)
+            bugs = project.searchTasks(status=all_bug_statuses)
         else:
-            bugs51 = self.project.searchTasks(status=(
-                untriaged_bug_statuses + open_bug_statuses), milestone=milestone51)
-            bugs502 = self.project.searchTasks(status=(
-                untriaged_bug_statuses + open_bug_statuses), milestone=milestone502)
-        #import pdb; pdb.set_trace()
+            print("Using hardcoded 5.1 & 5.0.2 milestones...")
+            if self.config.get('hcf'):
+                bugs51 = project.searchTasks(status=(
+                    open_bug_statuses_for_HCF), milestone=milestone51,
+                    importance=["Critical", "High"],
+                    # We would ideally filter our system-tests tag,
+                    # however I saw bugs which were just found during
+                    # sytem-tests run which are being real bugs in Fuel
+                    tags=["-docs", "-devops"],
+                    tags_combinator="All")
+                bugs502 = project.searchTasks(status=(
+                    open_bug_statuses_for_HCF), milestone=milestone502,
+                    importance=["Critical", "High"],
+                    tags=["-docs", "-devops"],
+                    tags_combinator="All")
+            else:
+                bugs51 = project.searchTasks(status=(
+                    untriaged_bug_statuses + open_bug_statuses), milestone=milestone51)
+                bugs502 = project.searchTasks(status=(
+                    untriaged_bug_statuses + open_bug_statuses), milestone=milestone502)
         printn("Processing bugs (%d):" % (len(bugs51) + len(bugs502)))
 
         for bugs in (bugs51, bugs502):
@@ -160,10 +180,15 @@ class Report(object):
                     print()
                 if counter % 10 == 0:
                     printn("%4d" % counter)
+
                 assignee = 'unassigned'
                 assignee_name = 'unassigned'
                 try:
                     assignee = get_name(bug.assignee)
+                    # We want to exclude all from QA & 
+                    #   fuel-devops & docs for HCF calcs
+                    if self.config.get('excludes') and assignee in self.config['excludes']:
+                        continue
                     assignee_name = bug.assignee.display_name
                 except Exception:
                     pass
@@ -182,11 +207,11 @@ class Report(object):
                     series = task.target
                     if is_series(series):
                         series = get_name(series)
-                        if task.target.project != self.project:
+                        if task.target.project != project:
                             continue
                     else:
                         series = None
-                        if task.target != self.project:
+                        if task.target != project:
                             continue
                     triage += self.checks.run(task, series)
                 report.append({

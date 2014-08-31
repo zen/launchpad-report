@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>lp-report: {{ config.project }}</title>
+<style>
+table {
+    border-collapse: collapse;
+}
+td, th {
+    border: solid #999 1px;
+    padding: 3px 7px 2px 7px;
+}
+th, th > a {
+    background-color: #eee;
+    color: #333;
+}
+a {
+    color: black;
+}
+a:visited {
+    color: #666;
+}
+</style>
+</head>
+<body>
+    <h1>lp-report: {{ config.project }}</h1>
+<h1>Bugs on teams</h1>
+<ul>
+{% set team_groups = rows|groupby('team') %}
+{% for team in team_groups %}
+    <li><a href="#team-{{ team.grouper }}">{{ team.grouper }}</a></li>
+{% endfor %}
+</ul>
+{% for team_group in team_groups %}
+<h3><a name="team-{{ team_group.grouper }}">{{ team_group.grouper }}</a></h3>
+<table>
+{% for status_group in team_group.list|groupby('short_status') %}
+<tr><th colspan="8"> {{ status_group.grouper }} {{ team_group.grouper }} - {{ status_group.list|length }} bug(s) </th></tr>
+<tr>
+<th>Title</th>
+<th>Milestone</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Assignee</th>
+<th>Full Name</th>
+<th>Required triage actions</th>
+</tr>
+{% for item in status_group.list|sort(attribute='milestone') %}
+{% if item.type == "bug" %}
+<tr>
+<td><a href="{{ item.link }}">{{ item.title }}</a></td>
+<td>{{ item.milestone }}</td>
+<td>{{ item.status }}</td>
+<td>{{ item.priority }}</td>
+<td>{{ item.assignee }}</td>
+<td>{{ item.name }}</td>
+<td>{{ item.triage }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+{% endfor %}
+</table>
+{% endfor %}
+</body>
+</html>

@@ -1,11 +1,14 @@
 project:
   - fuel
+  - mos
 # For debug. Proceed only limited amount of items in project
 trunc_report: 0
+# used for HCF calcs only
+hcf: 1
 cache_dir: cache
 use_auth: True
 teams:
-  python:
+  Fuel:
     fuel-python
     alekseyk-ru
     dshulyak
@@ -16,70 +19,62 @@ teams:
     akislitsky
     kozhukalov
     lux-place
-    a-gordeev
-  ui:
     fuel-ui
     vkramskikh
     astepanchuk
     bdudko
     kpimenova
     jkirnosova
-  library:
     fuel-library
-    sgolovatiuk
+    fuel-astute
+    vsharshov
+    a-gordeev
     xenolog
     adidenko
     raytrac3r
     idv1985
-    bogdando
     vkuklin
     sbogatkin
     xdeller
     andreika-mail
-    mmaxur
-    maxmazurenka
-  l2:
     manashkin
     ekozhemyakin
     akolesnikov
     fsoppelsa
-  astute:
-    fuel-astute
-    vsharshov
-  osci:
     fuel-osci
     sotpuschennikov
     dburmistrov
     vparakhin
     r0mikiam
     mrasskazov
-  qa:
-    fuel-qa
-    apalkina
-    aurlapova
-    tatyana-leontovich
-    asledzinskiy
-    apanchenko-8
-    ykotko
-  devops:
-    fuel-devops
-    afedorova
-    teran
-    acharykov
-  us:
     dborodaenko
     rmoe
     xarses
-    dreidellhasa
-    docaedo
-  moslinux:
+    tzn
+    salmon
+    ksambor
+    prmtl
+    loles
+    sgolovatiuk
+    bogdando
+    longgeek
+    berendt
+    jesse-pretorius
+    sammiestoel
+    zynzel
+    vpleshakov
+    vdenisov
+    nikishov-da
+    atarasov
+    dtyzhnenko
+  mos-linux:
     mos-linux
     apodrepniy
     kdanylov
     msemenov
     asheplyakov
     asyriy
-  mosopenstack:
+  mos-openstack:
     mos-neutron
     mos-nova
     mos-horizon
@@ -113,8 +108,10 @@ teams:
     tnurlygayanov
     tsufiev-x
     yorik-sar
+    mmaxur
+    maxmazurenka
     teselkin-d
-  partners:
+  Partners:
     eshumakher
     izinovik
     gcon-monolake
@@ -122,21 +119,17 @@ teams:
     moshele
     aviramb
     srogov
-  poland:
-    tzn
-    salmon
-    ksambor
-    prmtl
-    loles
-  external:
-    longgeek
-    berendt
-    jesse-pretorius
-    sammiestoel
-  other_mirantis:
-    zynzel
-    vpleshakov
-    vdenisov
-    nikishov-da
-    atarasov
-    dtyzhnenko
+excludes:
+    fuel-devops
+    afedorova
+    teran
+    acharykov
+    dreidellhasa
+    docaedo
+    fuel-qa
+    apalkina
+    aurlapova
+    tatyana-leontovich
+    asledzinskiy
+    apanchenko-8
+    ykotko

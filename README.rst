@@ -29,3 +29,6 @@ How to use
 ==========
 In order to get list of bugs per particular team lead:
 $ python cli.py -c launchpad_report/leads.yaml --template=launchpad_report/leads.html
+
+In order to get list of bugs affecting HCF:
+$ python cli.py -c launchpad_report/hcf.yaml --template=launchpad_report/hcf.html
