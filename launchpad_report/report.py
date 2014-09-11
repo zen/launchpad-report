@@ -158,12 +158,12 @@ class Report(object):
                     # We would ideally filter our system-tests tag,
                     # however I saw bugs which were just found during
                     # sytem-tests run which are being real bugs in Fuel
-                    tags=["-docs", "-devops", "-fuel-devops"],
+                    tags=["-docs", "-devops", "-fuel-devops", "-experimental"],
                     tags_combinator="All")
                 bugs502 = project.searchTasks(status=(
                     open_bug_statuses_for_HCF), milestone=milestone502,
                     importance=["Critical", "High"],
-                    tags=["-docs", "-devops", "-fuel-devops"],
+                    tags=["-docs", "-devops", "-fuel-devops", "-experimental"],
                     tags_combinator="All")
             else:
                 bugs51 = project.searchTasks(status=(
