@@ -152,6 +152,7 @@ class Report(object):
         else:
             print("Using hardcoded 5.1 & 5.0.2 milestones...")
             if self.config.get('hcf'):
+                raise # It should not go here
                 bugs51 = project.searchTasks(status=(
                     open_bug_statuses_for_HCF), milestone=milestone51,
                     importance=["Critical", "High"],
@@ -166,11 +167,8 @@ class Report(object):
                     tags=["-docs", "-devops", "-fuel-devops", "-experimental"],
                     tags_combinator="All")
             else:
-                bugs51 = project.searchTasks(status=(
-                    untriaged_bug_statuses + open_bug_statuses), milestone=milestone51)
-                bugs502 = project.searchTasks(status=(
-                    untriaged_bug_statuses + open_bug_statuses), milestone=milestone502)
-        printn("Processing bugs (%d):" % (len(bugs51) + len(bugs502)))
+                bugs51 = project.searchTasks(milestone=milestone51)
+                bugs502 = project.searchTasks(milestone=milestone502)
 
         for bugs in (bugs51, bugs502):
             for (counter, bug) in enumerate(bugs, 1):
@@ -181,15 +179,15 @@ class Report(object):
                 if counter % 10 == 0:
                     printn("%4d" % counter)
 
-                assignee = 'unassigned'
-                assignee_name = 'unassigned'
+                created_by = 'unassigned'
+                created_by_name = 'unassigned'
                 try:
-                    assignee = get_name(bug.assignee)
+                    created_by = get_name(bug.owner)
                     # We want to exclude all from QA & 
                     #   fuel-devops & docs for HCF calcs
-                    if self.config.get('excludes') and assignee in self.config['excludes']:
-                        continue
-                    assignee_name = bug.assignee.display_name
+                    #if self.config.get('excludes') and assignee in self.config['excludes']:
+                        #continue
+                    created_by_name = bug.owner.display_name
                 except Exception:
                     pass
                 if bug.milestone:
@@ -199,7 +197,7 @@ class Report(object):
                 team = 'unknown'
                 self.bug_issues.setdefault(bug.bug.web_link, [])
                 for t in self.teams.keys():
-                    if assignee in self.teams[t]:
+                    if created_by in self.teams[t]:
                         team = t
                 title = bug.bug.title
                 triage = []
@@ -226,8 +224,8 @@ class Report(object):
                     'short_status': short_status(bug),
                     'priority': bug.importance,
                     'team': team.encode('utf-8'),
-                    'assignee': assignee.encode('utf-8'),
-                    'name': assignee_name.encode('utf-8'),
+                    'assignee': created_by.encode('utf-8'),
+                    'name': created_by_name.encode('utf-8'),
                     'triage': ', '.join(triage).encode('utf-8'),
                 })
         print()

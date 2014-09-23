@@ -1,11 +1,12 @@
 project:
   - fuel
+  - mos
 # For debug. Proceed only limited amount of items in project
 trunc_report: 0
 cache_dir: cache
 use_auth: True
 teams:
-  dpyzhov:
+  fuel-dev:
     fuel-python
     alekseyk-ru
     dshulyak
@@ -16,14 +17,12 @@ teams:
     akislitsky
     kozhukalov
     lux-place
-  vkramskikh:
     fuel-ui
     vkramskikh
     astepanchuk
     bdudko
     kpimenova
     jkirnosova
-  vkuklin:
     fuel-library
     fuel-astute
     vsharshov
@@ -35,20 +34,38 @@ teams:
     vkuklin
     sbogatkin
     xdeller
-    andreika-mail
-  manashkin:
-    manashkin
-    ekozhemyakin
-    akolesnikov
-    fsoppelsa
-  rvyalov:
     fuel-osci
     sotpuschennikov
     dburmistrov
     vparakhin
     r0mikiam
     mrasskazov
-  aurlapova:
+    fuel-devops
+    afedorova
+    teran
+    acharykov
+    fuel-docs
+    dborodaenko
+    rmoe
+    xarses
+    dreidellhasa
+    docaedo
+    tzn
+    salmon
+    ksambor
+    prmtl
+    loles
+    sgolovatiuk
+    bogdando
+    ralekseenkov
+    mihgen
+    zynzel
+  fuel-l2:
+    manashkin
+    ekozhemyakin
+    akolesnikov
+    fsoppelsa
+  fuel-qa:
     fuel-qa
     apalkina
     aurlapova
@@ -56,25 +73,22 @@ teams:
     asledzinskiy
     apanchenko-8
     ykotko
-  ishishkin:
-    fuel-devops
-    afedorova
-    teran
-    acharykov
-  dborodaenko:
-    dborodaenko
-    rmoe
-    xarses
-    dreidellhasa
-    docaedo
-  msemenov:
+    komelchenko
+    ddmitriev
+    nfedotov
+    dtyzhnenko
+  mos-linux:
     mos-linux
     apodrepniy
     kdanylov
     msemenov
     asheplyakov
     asyriy
-  imarnat:
+    ashestakov
+    pchekin
+    amakarov
+  mos-openstack:
+    imarnat
     mos-neutron
     mos-nova
     mos-horizon
@@ -117,7 +131,13 @@ teams:
     akurilin
     pkholkin
     ekudryashova
-  eshumakher:
+    simon-pasquier
+    sgalkin
+    eyerediskin
+    aignatov
+    alashai8
+    alazarev
+  mos-partners:
     fuel-partner
     eshumakher
     izinovik
@@ -127,23 +147,50 @@ teams:
     aviramb
     srogov
     ekorekin
-  tnapierala:
-    tzn
-    salmon
-    ksambor
-    prmtl
-    loles
-    sgolovatiuk
-    bogdando
+    tdubyk
   external:
     longgeek
     berendt
     jesse-pretorius
     sammiestoel
-  other_mirantis:
-    zynzel
-    vpleshakov
-    vdenisov
-    nikishov-da
+    sbartel
+    amadama
+    l-brad
+    prashanth-padubidry
+    kupo
+    daniele-pizzolli
+    fjc
+    tns9
+    fga
+    nuritv
+    gilmeir-d
+    kupo
+    simon-monette
+    4-shaun
+  services:
+    agrebennikov
+    andreika-mail
+    gleb-q
+    rsokolkov
+    zoresvit
     atarasov
-    dtyzhnenko
+    dukov
+    slava-val-al
+    alexzzman
+    aabashkin
+    tsipa740
+    novel
+    vpleshakov
+    nikishov-da
+  support:
+    vdenisov
+    dipatov
+    arodionov
+    sanek-dobdin
+    arubtsov
+    pvaylov
+    paulreiber
+  other_mirantis:
+    gelkinbard
+    cclason
+    dnovakovskiy

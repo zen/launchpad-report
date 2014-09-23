@@ -33,19 +33,17 @@ a:visited {
 {% for team_group in team_groups %}
 <h3><a name="team-{{ team_group.grouper }}">{{ team_group.grouper }}</a></h3>
 <table>
-{% for status_group in team_group.list|groupby('short_status') %}
-{% if status_group.grouper in ['open', 'untriaged'] %}
-<tr><th colspan="8"> {{ status_group.grouper }} {{ team_group.grouper }}</th></tr>
+<tr><th colspan="8"> {{ team_group.grouper }} - {{ team_group.list|length }} bug(s) </th></tr>
 <tr>
 <th>Title</th>
 <th>Milestone</th>
 <th>Status</th>
 <th>Priority</th>
-<th>Assignee</th>
+<th>Reporter</th>
 <th>Full Name</th>
 <th>Required triage actions</th>
 </tr>
-{% for item in status_group.list|sort(attribute='milestone') %}
+{% for item in team_group.list|sort(attribute='milestone') %}
 {% if item.type == "bug" %}
 <tr>
 <td><a href="{{ item.link }}">{{ item.title }}</a></td>
@@ -56,8 +54,6 @@ a:visited {
 <td>{{ item.name }}</td>
 <td>{{ item.triage }}</td>
 </tr>
-{% endif %}
-{% endfor %}
 {% endif %}
 {% endfor %}
 </table>
