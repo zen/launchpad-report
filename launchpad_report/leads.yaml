@@ -60,12 +60,17 @@ teams:
     ralekseenkov
     mihgen
     zynzel
+    heos
+    oscitester
+    seyvet
   fuel-l2:
     manashkin
     ekozhemyakin
     akolesnikov
     fsoppelsa
   fuel-qa:
+    dkaiharodsev
+    anaboikina
     fuel-qa
     apalkina
     aurlapova
@@ -143,12 +148,14 @@ teams:
     izinovik
     gcon-monolake
     igajsin
-    moshele
-    aviramb
     srogov
     ekorekin
     tdubyk
+  external-parters:
+    moshele
+    aviramb
   external:
+    seyvet
     longgeek
     berendt
     jesse-pretorius
@@ -167,7 +174,24 @@ teams:
     kupo
     simon-monette
     4-shaun
+    box857+launchpad
+    hyperbaba
+    tschlabach
+    petebirley
+    jcxxin
+    gmcgrath
+    terry-s-duncan
+    piyush-harsh
+    kieleth
+    nikolay-zadoya
+    twforeman
+    cristian-a-sanchez
+    atze-devries
   services:
+    ivanzipfer
+    nikita-gubenko
+    akupko
+    mkraynov
     agrebennikov
     andreika-mail
     gleb-q
@@ -182,7 +206,9 @@ teams:
     novel
     vpleshakov
     nikishov-da
+    azvyagintsev
   support:
+    mashford
     vdenisov
     dipatov
     arodionov
@@ -190,7 +216,8 @@ teams:
     arubtsov
     pvaylov
     paulreiber
-  other_mirantis:
+  sales:
     gelkinbard
     cclason
     dnovakovskiy
+    magradallegir

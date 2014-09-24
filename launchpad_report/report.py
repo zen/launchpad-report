@@ -148,6 +148,7 @@ class Report(object):
         milestone51 = project.getMilestone(name="5.1")    # 5.1
         milestone502 = project.getMilestone(name="5.0.2") # 5.0.2
         if all:
+            raise # It should not go here
             bugs = project.searchTasks(status=all_bug_statuses)
         else:
             print("Using hardcoded 5.1 & 5.0.2 milestones...")
@@ -167,8 +168,8 @@ class Report(object):
                     tags=["-docs", "-devops", "-fuel-devops", "-experimental"],
                     tags_combinator="All")
             else:
-                bugs51 = project.searchTasks(milestone=milestone51)
-                bugs502 = project.searchTasks(milestone=milestone502)
+                bugs51 = project.searchTasks(milestone=milestone51, status=all_bug_statuses)
+                bugs502 = project.searchTasks(milestone=milestone502, status=all_bug_statuses)
 
         for bugs in (bugs51, bugs502):
             for (counter, bug) in enumerate(bugs, 1):
