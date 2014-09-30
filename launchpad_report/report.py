@@ -63,15 +63,6 @@ class Report(object):
         jsonfile = open(filename)
         self.data = json.load(jsonfile)
 
-    def generate(self, all=False):
-        self.data = {'rows': []}
-        self.bug_issues = {}
-        self.data['config'] = self.config
-        for project in self.projects:
-            self.checks = Checks(self.iter_series(project))
-            #self.data['rows'] += self.bp_report(all=all)
-            self.data['rows'] += self.bug_report(project, all=all)
-
     def iter_series(self, project):
         print("Collecting series data for %s:" % project)
         self.bps_series = {}
@@ -145,13 +136,12 @@ class Report(object):
 
     def bug_report(self, project, all=False):
         report = []
-        milestone51 = project.getMilestone(name="5.1")    # 5.1
-        milestone502 = project.getMilestone(name="5.0.2") # 5.0.2
         if all:
-            raise # It should not go here
-            bugs = project.searchTasks(status=all_bug_statuses)
+            bugs_list = [project.searchTasks(status=all_bug_statuses)]
         else:
             print("Using hardcoded 5.1 & 5.0.2 milestones...")
+            milestone51 = project.getMilestone(name="5.1")    # 5.1
+            milestone502 = project.getMilestone(name="5.0.2") # 5.0.2
             if self.config.get('hcf'):
                 raise # It should not go here
                 bugs51 = project.searchTasks(status=(
@@ -170,8 +160,9 @@ class Report(object):
             else:
                 bugs51 = project.searchTasks(milestone=milestone51, status=all_bug_statuses)
                 bugs502 = project.searchTasks(milestone=milestone502, status=all_bug_statuses)
+                bugs_list = [bugs51, bugs502]
 
-        for bugs in (bugs51, bugs502):
+        for bugs in bugs_list:
             for (counter, bug) in enumerate(bugs, 1):
                 if counter > self.trunc and self.trunc > 0:
                     break
@@ -231,3 +222,12 @@ class Report(object):
                 })
         print()
         return report
+
+    def generate(self, all=False):
+        self.data = {'rows': []}
+        self.bug_issues = {}
+        self.data['config'] = self.config
+        for project in self.projects:
+            self.checks = Checks(self.iter_series(project))
+            #self.data['rows'] += self.bp_report(all=all)
+            self.data['rows'] += self.bug_report(project, all=all)
