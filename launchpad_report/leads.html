@@ -35,7 +35,7 @@ a:visited {
 {% for milestone_group in milestone_groups %}
 <h3><a name="team-{{ team_group.grouper }}">{{ team_group.grouper }}</a></h3>
 <table>
-    <tr><th colspan="8"> {{ team_group.grouper }} - milestone {{milestone_group.grouper }} - {{ team_group.list|length }} bug(s) </th></tr>
+    <tr><th colspan="8"> {{ team_group.grouper }} - milestone {{milestone_group.grouper }} - {{ milestone_group.list|length }} bug(s) </th></tr>
 <tr>
 <th>Title</th>
 <th>Milestone</th>

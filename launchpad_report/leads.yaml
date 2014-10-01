@@ -21,14 +21,19 @@ teams:
     vkramskikh
     astepanchuk
     bdudko
+    deaster
     kpimenova
     jkirnosova
     fuel-library
     fuel-astute
     vsharshov
+    nprikazchikov
+    nkorshenin
+    kcherchenko
     a-gordeev
     xenolog
     adidenko
+    gelbuhos
     raytrac3r
     idv1985
     vkuklin
@@ -42,6 +47,7 @@ teams:
     mrasskazov
     fuel-devops
     afedorova
+    anotchenko
     teran
     acharykov
     fuel-docs
@@ -63,11 +69,24 @@ teams:
     heos
     oscitester
     seyvet
-  fuel-l2:
+    mashford
+    vdenisov
+    dipatov
+    mpetason
+    arodionov
+    sanek-dobdin
+    arubtsov
+    dkostryukov
+    pvaylov
+    mefimov
+    jpf
+    paulreiber
+    tjaroszewski
     manashkin
     ekozhemyakin
     akolesnikov
     fsoppelsa
+    demon-mhm
   fuel-qa:
     dkaiharodsev
     anaboikina
@@ -92,6 +111,9 @@ teams:
     ashestakov
     pchekin
     amakarov
+    vlos
+    amogylchenko
+    pboldin
   mos-openstack:
     imarnat
     mos-neutron
@@ -115,6 +137,14 @@ teams:
     akamyshnikova
     dbelova
     efedorova
+    ativelkov
+    nprivalova
+    ityaptin
+    yyekovenko
+    boris-42
+    guillaume-thouvenin
+    diakunchikov
+    degorenko
     enikanorov
     iyozhikov
     shakhat
@@ -143,6 +173,8 @@ teams:
     alashai8
     alazarev
     maretskiy
+    snikitin
+    slystopad
   mos-partners:
     fuel-partner
     eshumakher
@@ -156,6 +188,22 @@ teams:
     moshele
     aviramb
   external:
+    jouston-huang
+    arminder
+    jkyle
+    maecin
+    dbryson-6
+    win1dest
+    wgjohnson
+    qrilka
+    jlondon
+    kir-vondreth
+    keshavdv
+    abdullah-alzanidi
+    kevinbenton
+    beltranlope
+    juan-osorio-robles
+    fsmith-6
     seyvet
     longgeek
     berendt
@@ -188,7 +236,29 @@ teams:
     twforeman
     cristian-a-sanchez
     atze-devries
+    jeffsilverm
+    cnaveens
+    claude-d
+    zone-s
+    9-tim-9
+    vtzanoudakis
+    vincent-hurtevent
+    radek-slavicinsky
+    papabalyo
+    maurof
+    okosse
+    pasianou
+    zhaowy
   services:
+    obalakirev
+    kdemina
+    akolodyazhnyy
+    npliashechnikov
+    vsakharov
+    akuleshov
+    istegantsev
+    nzaporozhets
+    grishkin
     ivanzipfer
     nikita-gubenko
     akupko
@@ -208,17 +278,21 @@ teams:
     vpleshakov
     nikishov-da
     azvyagintsev
-  support:
-    mashford
-    vdenisov
-    dipatov
-    arodionov
-    sanek-dobdin
-    arubtsov
-    pvaylov
-    paulreiber
+    osavatieiev
+    sfabel
+    rrufanov
+    chuebner-5
+    jvenner-e
   sales:
     gelkinbard
     cclason
     dnovakovskiy
     magradallegir
+    dsorrentino
+    chenxiao
+  marketing:
+    pkarpov
+    nickchase
+    jacobwal
+    samuel-bartel
+    myakura
