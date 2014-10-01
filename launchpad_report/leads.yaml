@@ -69,10 +69,13 @@ teams:
     heos
     oscitester
     seyvet
+    demon-mhm
+  support:
     mashford
     vdenisov
     dipatov
     mpetason
+    mkraynov
     arodionov
     sanek-dobdin
     arubtsov
@@ -82,11 +85,11 @@ teams:
     jpf
     paulreiber
     tjaroszewski
+  fuel-l2-support:
     manashkin
     ekozhemyakin
     akolesnikov
     fsoppelsa
-    demon-mhm
   fuel-qa:
     dkaiharodsev
     anaboikina
@@ -262,7 +265,6 @@ teams:
     ivanzipfer
     nikita-gubenko
     akupko
-    mkraynov
     agrebennikov
     andreika-mail
     gleb-q
