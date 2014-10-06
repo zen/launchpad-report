@@ -145,12 +145,11 @@ class Report(object):
 
     def bug_report(self, project, all=False):
         report = []
-        milestone51 = project.getMilestone(name="5.1")    # 5.1
-        milestone502 = project.getMilestone(name="5.0.2") # 5.0.2
+        milestone51 = project.getMilestone(name="6.0")    # 5.1
+        milestone502 = project.getMilestone(name="5.0.3") # 5.0.2
         if all:
             bugs = project.searchTasks(status=all_bug_statuses)
         else:
-            print("Using hardcoded 5.1 & 5.0.2 milestones...")
             if self.config.get('hcf'):
                 bugs51 = project.searchTasks(status=(
                     open_bug_statuses_for_HCF), milestone=milestone51,
@@ -170,7 +169,7 @@ class Report(object):
                     untriaged_bug_statuses + open_bug_statuses), milestone=milestone51)
                 bugs502 = project.searchTasks(status=(
                     untriaged_bug_statuses + open_bug_statuses), milestone=milestone502)
-        printn("Processing bugs (%d):" % (len(bugs51) + len(bugs502)))
+        #printn("Processing bugs (%d):" % (len(bugs51) + len(bugs502)))
 
         for bugs in (bugs51, bugs502):
             for (counter, bug) in enumerate(bugs, 1):
