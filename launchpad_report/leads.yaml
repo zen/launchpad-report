@@ -82,6 +82,7 @@ teams:
     mos-oslo
     mos-sahara
     mos-heat
+    mos-cinder
     mos-murano
     iberezovskiy
     e0ne
